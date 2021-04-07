@@ -155,7 +155,7 @@
                             <t t-foreach="ship_to" t-as="address">
                                 <detallista:name t-raw="address.name"/>
                                 <detallista:streetAddressOne
-                                    t-raw="', '.join([x for x in (address.street, address.l10n_mx_edi_colony) if x]) or False"/>
+                                    t-raw="', '.join([x for x in (address.street, address.l10n_mx_edi_colony) if x])[:35] or False"/>
                                 <detallista:city t-raw="address.city"/>
                                 <detallista:postalCode t-raw="address.zip"/>
                             </t>
@@ -171,7 +171,7 @@
                             <detallista:nameAndAddress>
                                 <detallista:name t-raw="issued.name"/>
                                 <detallista:streetAddressOne
-                                    t-raw="', '.join([getattr(issued, fld) for fld in ('street', 'l10n_mx_edi_colony') if getattr(issued, fld)]) or False"/>
+                                    t-raw="', '.join([getattr(issued, fld) for fld in ('street', 'l10n_mx_edi_colony')[:35] if getattr(issued, fld)]) or False"/>
                                 <detallista:city t-raw="issued.city"/>
                                 <detallista:postalCode t-raw="issued.zip"/>
                             </detallista:nameAndAddress>
