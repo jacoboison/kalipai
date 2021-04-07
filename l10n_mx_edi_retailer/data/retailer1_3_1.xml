@@ -193,11 +193,11 @@
                     <t t-set="pay_term" t-value="record.invoice_payment_term_id"/>
                     <t t-if="pay_term"
                         t-set="pay_term_period"
-                        t-value="record.invoice_date_due - record.date_invoice"/>
+                        t-value="record.invoice_date_due - record.invoice_date"/>
                     <t t-set="percentage_discount" t-value="100*float(amount_discount or 0.0)/float(amount_untaxed)"/>
                     <detallista:paymentTerms
                         t-if="pay_term"
-                        t-att-paymentTermsEvent="'DATE_OF_INVOICE' if record.date_invoice == record.invoice_date_due else 'EFFECTIVE_DATE'"
+                        t-att-paymentTermsEvent="'DATE_OF_INVOICE' if record.invoice_date == record.invoice_date_due else 'EFFECTIVE_DATE'"
                         PaymentTermsRelationTime="REFERENCE_AFTER">
                         <detallista:netPayment
                             t-att-netPaymentTermsType="'END_OF_MONTH' if pay_term.line_ids[-1].option in ('last_day_current_month', 'last_day_following_month') else 'BASIC_NET'">
