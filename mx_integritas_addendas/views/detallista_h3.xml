@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="detallista_h3" inherit_id="l10n_mx_edi_retailer.retailer">
+        <xpath expr="//*[local-name()='shipTo']" position="replace">
+             
+             <detallista:shipTo t-if="ship_to" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:detallista="http://www.sat.gob.mx/detallista">
+                <detallista:gln t-raw="ship_to.mx_integritas_eanprov or ''"/>
+                <detallista:nameAndAddress>
+                    <!-- TODO check if multiple shipping addresses may be specified -->
+                    <t t-foreach="ship_to" t-as="address">
+                        <detallista:name t-raw="address.name[:35]"/>
+                        <detallista:streetAddressOne
+                            t-raw="address.street"/>
+                        <detallista:city t-raw="address.city"/>
+                        <detallista:postalCode t-raw="address.zip"/>
+                    </t>
+                </detallista:nameAndAddress>
+            </detallista:shipTo>
+       
+        </xpath>
+    </template>
+</odoo>

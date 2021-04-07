@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_mx_integritas_partner_form_inherit" model="ir.ui.view">
+            <field name="name">mx.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+             <xpath expr="//page[last()]" position="after"> 
+                <page string="Datos Addenda" name="Datos Addenda" >
+                <group name="Datos Addenda">
+                    <field name="mx_integritas_claveprov"/>
+                    <field name="mx_integritas_califprov"/>
+                    <field name="mx_integritas_eanprov"/>
+                    <field name="mx_integritas_no_tienda"/>
+                 </group>
+                 </page>
+              </xpath>         
+                 
+            </field>
+        </record>
+    </data>
+</odoo>
