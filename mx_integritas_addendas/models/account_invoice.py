@@ -135,7 +135,7 @@ class AccountInvoice(models.Model):
                     if (etiq.tag_ids.name=='IEPS'):
                         print("IEPS->")
                         monto_ieps=monto_ieps+(tax.amount / 100 * float("%.2f" % line.price_subtotal))
-                    if(etiq.tag_ids.name!='IVA' and tax.tag_ids.name!='IEPS'):
+                    if(etiq.tag_ids.name!='IVA' and etiq.tag_ids.name!='IEPS'):
                         monto_otro_imp=monto_otro_imp+(tax.amount / 100 * float("%.2f" % line.price_subtotal))
 
             inv.mx_integritas_montoiva=monto_iva

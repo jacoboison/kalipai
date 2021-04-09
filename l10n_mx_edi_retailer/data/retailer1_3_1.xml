@@ -13,7 +13,8 @@
                     type="SimpleInvoiceType"
                     contentVersion="1.3.1"
                     documentStructureVersion="AMC8.1"
-                    t-att-documentStatus="values[0].upper()">
+                    t-att-documentStatus="values[0].upper()"
+                    xmlns:detallista="http://www.sat.gob.mx/detallista">
                     <detallista:requestForPaymentIdentification>
                         <t t-set="document_type_dict" t-value="{'i': 'INVOICE', 'e': 'CREDIT_NOTE'}"/>
                         <detallista:entityType t-raw="document_type_dict.get(document_type[0], document_type)"/>
@@ -43,11 +44,11 @@
                             t-raw="record.l10n_mx_edi_amount_to_text()"/>
                     </detallista:specialInstruction>
                     <detallista:orderIdentification>
-                        <t t-foreach="record.invoice_origin and record.invoice_origin.split(',') or []" t-as="identification">
+                        
                             <detallista:referenceIdentification
                                 type="ON"
-                                t-raw="identification"/>
-                        </t>
+                                t-raw="record.consulta_pedido().client_order_ref"/>
+                        
                         <detallista:ReferenceDate
                             t-raw="values[1] or False"/>
                     </detallista:orderIdentification>
@@ -133,7 +134,7 @@
                     <t t-if="supplier.ref">
                         <detallista:seller>
                             <!-- TODO check if supplier.ref applies for both cases -->
-                            <detallista:gln t-raw="supplier.ref or ''"/>
+                            <detallista:gln t-raw="record.format_dato(supplier.ref,13) or ''"/>
                             <t t-if="record.partner_id.tipo_ref_supplier=='nip' or not record.partner_id.tipo_ref_supplier">
                             <detallista:alternatePartyIdentification
                                 type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"
@@ -194,7 +195,7 @@
                     <t t-if="pay_term"
                         t-set="pay_term_period"
                         t-value="record.invoice_date_due - record.invoice_date"/>
-                    <t t-set="percentage_discount" t-value="100*float(amount_discount or 0.0)/float(amount_untaxed)"/>
+                    <t t-set="percentage_discount" t-value="round(100*float(amount_discount or 0.0)/float(amount_untaxed),record.company_id.currency_id.decimal_places)"/>
                     <detallista:paymentTerms
                         t-if="pay_term"
                         t-att-paymentTermsEvent="'DATE_OF_INVOICE' if record.invoice_date == record.invoice_date_due else 'EFFECTIVE_DATE'"
@@ -209,7 +210,7 @@
                         </detallista:netPayment>
                         <detallista:discountPayment
                             t-att-discountType="'ALLOWANCE_BY_PAYMENT_ON_TIME' if percentage_discount >= 0 else 'SANCTION'">
-                          <detallista:percentage t-raw="'%.*f' % (4 - len(str(int(percentage_discount))), percentage_discount)"/>
+                          <detallista:percentage t-raw="'%.*f' % (record.company_id.currency_id.decimal_places, percentage_discount)"/>
                         </detallista:discountPayment>
                     </detallista:paymentTerms>
                     <detallista:shipmentDetail/>
@@ -221,7 +222,7 @@
                         <detallista:specialServicesType t-raw="values[3].upper()"/>
                         <detallista:monetaryAmountOrPercentage>
                             <detallista:rate base="INVOICE_VALUE">
-                                <detallista:percentage t-raw="percentage_discount"/>
+                                <detallista:percentage t-raw="round(percentage_discount,record.company_id.currency_id.decimal_places)"/>
                             </detallista:rate>
                         </detallista:monetaryAmountOrPercentage>
                     </detallista:allowanceCharge>
@@ -234,7 +235,7 @@
                         <detallista:specialServicesType t-raw="values[3].upper()"/>
                         <detallista:monetaryAmountOrPercentage>
                             <detallista:rate base="INVOICE_VALUE">
-                                <detallista:percentage t-raw="percentage_discount"/>
+                                <detallista:percentage t-raw="round(percentage_discount,record.company_id.currency_id.decimal_places)"/>
                             </detallista:rate>
                         </detallista:monetaryAmountOrPercentage>
                     </detallista:allowanceCharge>
@@ -254,13 +255,13 @@
                             <detallista:alternateTradeItemIdentification
                                 t-if="line.product_id.tipo_cod_detallista == 'saa'"
                                 type="SUPPLIER_ASSIGNED"
-                                t-raw="line.product_id.code"/>
+                                t-raw="line.product_id.default_code"/>
                             <detallista:tradeItemDescriptionInformation
                                 t-att-language="'EN' if record.env.context.get('lang', '').startswith('en') else 'ES'">
                                 <detallista:longText t-raw="line.product_id.name[:35]"/>
                             </detallista:tradeItemDescriptionInformation>
                             <detallista:invoicedQuantity
-                                t-att-unitOfMeasure="line.product_uom_id.l10n_mx_edi_code_sat_id.code"
+                                t-att-unitOfMeasure="line.product_uom_id.name"
                                 t-raw="line.quantity"/>
                             <detallista:grossPrice>
                                 <detallista:Amount t-raw="subtotal_wo_discount(line)/(line.quantity or 1.0)"/>
