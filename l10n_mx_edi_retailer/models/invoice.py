@@ -29,14 +29,14 @@ class AccountInvoice(models.Model):
         for invoice in self:
             if invoice.x_complement_retailer_data:
                 print("Ret")
-                tree = str(base64.decodestring(xml_signed))
+                tree = str(base64.decodestring(xml_signed).decode("utf-8"))
                 #print(xml_signed)
                 a=tree
                 print(a)
                 a=str(a).replace("<detallista:detallista","<detallista:detallista xmlns:detallista=\"http://www.sat.gob.mx/detallista\"")
-                a=str(a).replace("\\r\\n","").replace("b'<","<").replace(">'",">")
-                print("")
-                print(a)
+                #a=str(a).replace("\\r\\n","").replace("b'<","<").replace(">'",">")
+                #print("")
+                #print(a)
                 xml_signed = base64.encodestring(bytes(a, 'UTF-8'))
                 attachment_id = self.l10n_mx_edi_retrieve_last_attachment()
                 attachment_id.write({
@@ -47,6 +47,8 @@ class AccountInvoice(models.Model):
             else:
                 print("No retailler")
                 super(AccountInvoice, self).l10n_mx_edi_append_addenda(xml_signed)
+
+    
 
 
 
