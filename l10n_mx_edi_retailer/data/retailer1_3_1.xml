@@ -292,20 +292,20 @@
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
                         <detallista:specialServicesType t-raw="values[3].upper()"/>
-                        <detallista:Amount t-raw="amount_discount or 0.0"/>
+                        <detallista:Amount t-raw="'{0:.2f}'.format(amount_discount or 0.0)"/>
                     </detallista:TotalAllowanceCharge>
                     <t t-if="taxes['total_transferred']!= 0">
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
                         <detallista:specialServicesType>TX</detallista:specialServicesType>
-                        <detallista:Amount t-raw="taxes['total_transferred']"/>
+                        <detallista:Amount t-raw="'{0:.2f}'.format(taxes['total_transferred'])"/>
                     </detallista:TotalAllowanceCharge>
                     </t>
                     <t t-if="taxes['total_withhold'] != 0">
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="CHARGE">
                         <detallista:specialServicesType>TX</detallista:specialServicesType>
-                        <detallista:Amount t-raw="taxes['total_withhold']"/>
+                        <detallista:Amount t-raw="'{0:.2f}'.format(taxes['total_withhold'])"/>
                     </detallista:TotalAllowanceCharge>
                     </t>
                 </detallista:detallista>
