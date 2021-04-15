@@ -131,7 +131,7 @@
                             </detallista:personOrDepartmentName>
                         </detallista:contactInformation>
                     </detallista:buyer>
-                    <t t-if="supplier.ref">
+                    
                         <detallista:seller>
                             <!-- TODO check if supplier.ref applies for both cases -->
                             <detallista:gln t-raw="record.format_dato(supplier.ref,13) or ''"/>
@@ -146,7 +146,7 @@
                                 t-raw="supplier.ref"/>
                             </t>
                         </detallista:seller>
-                    </t>
+                    
                     <t t-set="ship_to" t-value="record.env['res.partner'].browse(record.partner_shipping_id.id)"/>
                     <detallista:shipTo
                         t-if="ship_to">
