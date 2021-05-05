@@ -292,9 +292,9 @@
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
                         <detallista:specialServicesType t-raw="values[3].upper()"/>
-                        <detallista:Amount t-raw="'{0:.2f}'.format(amount_discount or 0.0)"/>
+                        <detallista:Amount t-raw="'{0:.2f}'.format(float(amount_discount) or 0.0)"/>
                     </detallista:TotalAllowanceCharge>
-                    <t t-if="taxes['total_transferred']!= 0">
+                    <t t-if="taxes['total_transferred'] &lt;= 0">
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
                         <detallista:specialServicesType>TX</detallista:specialServicesType>
