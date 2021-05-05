@@ -11,6 +11,7 @@
                 <group name="Datos Addenda">
                     <field name="mx_integritas_claveprov"/>
                     <field name="mx_integritas_califprov"/>
+                    <field name="mx_integritas_eanodooco"/>
                     <field name="mx_integritas_eanprov"/>
                     <field name="mx_integritas_no_tienda"/>
                  </group>

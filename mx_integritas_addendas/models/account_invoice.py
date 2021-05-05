@@ -141,6 +141,23 @@ class AccountInvoice(models.Model):
             inv.mx_integritas_montoiva=monto_iva
             inv.mx_integritas_montoieps=monto_ieps
             inv.mx_integritas_monto_otros_imp=monto_otro_imp
+    
+    def consulta_pedido(self):
+    
+        for invoice in self:
+            for line in invoice.invoice_line_ids:
+                for lineaped in line.sale_line_ids:
+                    order=lineaped.order_id
+
+        return order
+
+    def format_dato(self,cad,med):
+        largo=len(cad)
+        dig_req=med-largo
+        digitos_extra=''
+        for e in range(dig_req):
+            digitos_extra=digitos_extra+'0'
+        return digitos_extra+cad
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.move.line'

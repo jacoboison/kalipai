@@ -6,6 +6,7 @@ class ResPartner(models.Model):
     mx_integritas_califprov=fields.Char(string="Calificación Proveedor",traslate=True)
     mx_integritas_eanprov=fields.Char(string="GLN (Num. localizaciòn)",traslate=True)
     mx_integritas_no_tienda=fields.Char(string="No tienda",traslate=True)
+    mx_integritas_eanodooco=fields.Char(string="GLN (Num. localizaciòn) de Emisor addenda.",traslate=True)
 
 
 
