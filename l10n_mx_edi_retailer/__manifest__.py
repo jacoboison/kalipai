@@ -8,7 +8,7 @@
     'category': 'Hidden',
     'summary': 'Mexican Localization for EDI documents',
     'depends': [
-        'l10n_mx_edi',
+        'l10n_mx_edi','mx_integritas_addendas',
     ],
     'data': [
         "data/retailer1_3_1.xml",

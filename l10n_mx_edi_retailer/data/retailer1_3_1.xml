@@ -123,27 +123,27 @@
                     </t>
                     <detallista:buyer>
                         <!-- TODO ensure the GLN may be taken from the ref -->
-                        <detallista:gln t-raw="customer.ref or ''"/>
+                        <detallista:gln t-raw="customer.mx_integritas_eanprov or customer.ref or ''"/>
                         <detallista:contactInformation>
                             <detallista:personOrDepartmentName>
                                 <!-- TODO check if taking the name from the user makes any sense -->
-                                <detallista:text t-raw="customer.user_id.ref or customer.user_id.name or customer.name"/>
+                                <detallista:text t-raw="record.partner_shipping_id.mx_integritas_no_tienda"/>
                             </detallista:personOrDepartmentName>
                         </detallista:contactInformation>
                     </detallista:buyer>
                     
                         <detallista:seller>
                             <!-- TODO check if supplier.ref applies for both cases -->
-                            <detallista:gln t-raw="record.format_dato(supplier.ref,13) or ''"/>
+                            <detallista:gln t-raw="record.format_dato(record.partner_id.mx_integritas_eanodooco,13) or ''"/>
                             <t t-if="record.partner_id.tipo_ref_supplier=='nip' or not record.partner_id.tipo_ref_supplier">
                             <detallista:alternatePartyIdentification
                                 type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"
-                                t-raw="supplier.ref"/>
+                                t-raw="record.partner_id.mx_integritas_eanodooco"/>
                             </t>
                             <t t-if="record.partner_id.tipo_ref_supplier=='ri'">
                             <detallista:alternatePartyIdentification
                                 type="IEPS_REFERENCE"
-                                t-raw="supplier.ref"/>
+                                t-raw="record.partner_id.mx_integritas_eanodooco"/>
                             </t>
                         </detallista:seller>
                     
