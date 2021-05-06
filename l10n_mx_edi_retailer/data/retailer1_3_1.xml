@@ -262,7 +262,7 @@
                             </detallista:tradeItemDescriptionInformation>
                             <detallista:invoicedQuantity
                                 t-att-unitOfMeasure="line.product_uom_id.name"
-                                t-raw="line.quantity"/>
+                                t-raw="'{0:.0f}'.format(line.quantity or 0.0)"/>
                             <detallista:grossPrice>
                                 <detallista:Amount t-raw="'{0:.2f}'.format(subtotal_wo_discount(line)/(line.quantity or 1.0) or 0.0)"/>
                             </detallista:grossPrice>
