@@ -246,16 +246,16 @@
                             type="SimpleInvoiceLineItemType"
                             t-att-number="cont">
                             <detallista:tradeItemIdentification>
-                                <detallista:gtin t-raw="line.product_id.barcode or 'N/A'"/>
+                                <detallista:gtin t-raw="line.product_id.mx_integritas_gln or line.product_id.product_tmpl_id.mx_integritas_gln or line.product_id.barcode or 'N/A'"/>
                             </detallista:tradeItemIdentification>
                             <detallista:alternateTradeItemIdentification
                                 t-if="line.product_id.tipo_cod_detallista == 'baa'"
                                 type="BUYER_ASSIGNED"
-                                t-raw="line.product_id.default_code"/>
+                                t-raw="line.product_id.mx_integritas_ref or line.product_id.product_tmpl_id.mx_integritas_ref or line.product_id.default_code"/>
                             <detallista:alternateTradeItemIdentification
                                 t-if="line.product_id.tipo_cod_detallista == 'saa'"
                                 type="SUPPLIER_ASSIGNED"
-                                t-raw="line.product_id.default_code"/>
+                                t-raw="line.product_id.mx_integritas_ref or line.product_id.product_tmpl_id.mx_integritas_ref or line.product_id.default_code"/>
                             <detallista:tradeItemDescriptionInformation
                                 t-att-language="'EN' if record.env.context.get('lang', '').startswith('en') else 'ES'">
                                 <detallista:longText t-raw="line.product_id.name[:35]"/>
@@ -292,7 +292,7 @@
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
                         <detallista:specialServicesType t-raw="values[3].upper()"/>
-                        <detallista:Amount t-raw="'{0:.2f}'.format(float(amount_discount) or 0.0)"/>
+                        <detallista:Amount t-raw="'{0:.2f}'.format(float(amount_discount or '0.00') or 0.0)"/>
                     </detallista:TotalAllowanceCharge>
                     <t t-if="taxes['total_transferred'] &lt;= 0">
                     <detallista:TotalAllowanceCharge
