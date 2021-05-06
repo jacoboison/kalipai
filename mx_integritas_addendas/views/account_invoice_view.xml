@@ -20,7 +20,7 @@
                     <field name="mx_integritas_fecha_recepcion" attrs="{'invisible':['|',('mx_integritas_hide_fecha_recepcion', '=', True),('mx_integritas_hide_fecha_recepcion_auto', '=', True)]}"/>
                     <field name="mx_integritas_fecha_recepcion_auto" attrs="{'invisible':[('mx_integritas_hide_fecha_recepcion_auto', '=', False)]}"/>
                     <field name="mx_integritas_no_cita"  attrs="{'invisible':[('mx_integritas_hide_no_cita', '=', True)]}"/>
-                    <field name="mx_integritas_no_contrarecibo"  attrs="{'invisible':[('mx_integritas_hide_no_contrarecibo', '=', False)]}"/>
+                    <field name="mx_integritas_no_contrarecibo"  attrs="{'invisible':[('mx_integritas_hide_no_contrarecibo', '=', True)]}"/>
 
                     <!--<field name="mx_integritas_no_factura" attrs="{'invisible':[('mx_integritas_hide_no_factura', '=', True)]}"/>
                     <field name="mx_integritas_fecha_factura"/>
