@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="detallista_h1" inherit_id="l10n_mx_edi_retailer.retailer">
+        <xpath expr="//*[local-name()='buyer']" position="replace">
+        	<detallista:buyer xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:detallista="http://www.sat.gob.mx/detallista">
+
+               	<detallista:gln t-raw="customer.mx_integritas_eanprov or ''"/>
+                <detallista:contactInformation>
+                    <detallista:personOrDepartmentName>
+                        <!-- TODO check if taking the name from the user makes any sense -->
+                        <detallista:text t-raw="customer.user_id.ref or customer.user_id.name or customer.name"/>
+                    </detallista:personOrDepartmentName>
+                </detallista:contactInformation>
+
+            </detallista:buyer>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="detallista_h4" inherit_id="l10n_mx_edi_retailer.retailer">
+        <xpath expr="//t[@t-if='issued and issued != supplier']" position="replace">
+           
+           <t t-if="issued and issued != supplier">
+                <detallista:InvoiceCreator xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:detallista="http://www.sat.gob.mx/detallista">
+                    <detallista:gln t-raw="issued.ref or '22222XXAAXXAA'"/>
+                    <!-- TODO check codes to ensure IA is the proper one -->
+                    <detallista:alternatePartyIdentification
+                        type="IA"
+                        t-raw="issued.ref or '22222XXAAXXAA'"/>
+                    <detallista:nameAndAddress>
+                        <detallista:name t-raw="issued.name"/>
+                        <detallista:streetAddressOne
+                            t-raw="', '.join([getattr(issued, fld) for fld in ('street', 'l10n_mx_edi_colony') if getattr(issued, fld)]) or False"/>
+                        <detallista:city t-raw="issued.city"/>
+                        <detallista:postalCode t-raw="issued.zip"/>
+                    </detallista:nameAndAddress>
+                </detallista:InvoiceCreator>
+            </t>
+       
+        </xpath>
+    </template>
+</odoo>

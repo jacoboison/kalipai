@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="detallista_h2" inherit_id="l10n_mx_edi_retailer.retailer">
+        <xpath expr="//t[@t-if='supplier.ref']" position="replace">
+
+            <t t-if="supplier.mx_integritas_eanprov">
+                <detallista:seller xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:detallista="http://www.sat.gob.mx/detallista">
+                    <!-- TODO check if supplier.ref applies for both cases -->
+                    <detallista:gln t-raw="supplier.mx_integritas_eanprov or ''"/>
+                    <detallista:alternatePartyIdentification
+                        type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"
+                        t-raw="supplier.mx_integritas_eanprov or ''"/>
+                </detallista:seller>
+            </t>
+
+        </xpath>
+    </template>
+</odoo>
