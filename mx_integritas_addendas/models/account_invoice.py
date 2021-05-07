@@ -61,6 +61,7 @@ class AccountInvoice(models.Model):
             record.mx_integritas_hide_fecha_recepcion=False
             record.mx_integritas_hide_no_factura=False
             record.mx_integritas_hide_no_cita=False
+            record.mx_integritas_hide_no_contrarecibo=False
 
             if(record.mx_integritas_show_datos_addenda):
                 addenda=record.partner_id.l10n_mx_edi_addenda.arch_base
@@ -76,7 +77,9 @@ class AccountInvoice(models.Model):
                     if(addenda.find("mx_integritas_no_factura")<=-1):
                         record.mx_integritas_hide_no_factura=True  
                     if(addenda.find("mx_integritas_no_cita")<=-1):
-                        record.mx_integritas_hide_no_cita=True                  
+                        record.mx_integritas_hide_no_cita=True
+                    if(addenda.find("mx_integritas_no_contrarecibo")<=-1):
+                        record.mx_integritas_hide_no_contrarecibo=True                  
 
 
     def _set_datos_atomaticos(self):
