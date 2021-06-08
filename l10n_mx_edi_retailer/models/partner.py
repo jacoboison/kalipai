@@ -20,3 +20,8 @@ class ResPartner(models.Model):
         ('ri', 'Referencia IEPS')],
         string="Tipo de Tercero")
     mostrar_currency=fields.Boolean(string="Mostrar Seccíon Moneda")
+    mostrar_aab=fields.Boolean(string="Mostrar Seccíon AAB")
+    mostrar_shipto=fields.Boolean(string="Mostrar Seccíon Envio A")
+    mostrar_term_pago=fields.Boolean(string="Mostrar Seccíon terminos de pago")
+    mostrar_seq_number=fields.Boolean(string="Mostrar Secuencia")
+    mostrar_ad_inf=fields.Boolean(string="Mostrar Informacion adicional")
