@@ -25,3 +25,4 @@ class ResPartner(models.Model):
     mostrar_term_pago=fields.Boolean(string="Mostrar Seccíon terminos de pago")
     mostrar_seq_number=fields.Boolean(string="Mostrar Secuencia")
     mostrar_ad_inf=fields.Boolean(string="Mostrar Informacion adicional")
+    total_sin_descimp=fields.Boolean(string="Total sin Impuestos ni Descuentos")

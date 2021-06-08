@@ -18,6 +18,7 @@
                     <field name="mostrar_term_pago"/>
                     <field name="mostrar_seq_number"/>
                     <field name="mostrar_ad_inf"/>
+                    <field name="total_sin_descimp"/>
                     
                  </group>
                  </page>

@@ -262,6 +262,7 @@
                     </detallista:allowanceCharge>
                     </t>
                     <t t-set="cont" t-value="1"/>
+                    <t t-set="total_neto" t-value="0"/>
                     <t t-foreach="lines" t-as="line">
                         <detallista:lineItem
                             type="SimpleInvoiceLineItemType"
@@ -308,9 +309,15 @@
                             </detallista:totalLineAmount>
                         </detallista:lineItem>
                         <t t-set="cont" t-value="cont+1"/>
+                        <t t-set="total_neto" t-value="total_neto + (line.price_unit*line.quantity)"/>
                     </t>
                     <detallista:totalAmount>
+                        <t t-if="record.partner_id.total_sin_descimp">
+                        <detallista:Amount t-raw="'{0:.2f}'.format(float(total_neto) or 0.0)"/>
+                        </t>
+                        <t t-if="not record.partner_id.total_sin_descimp">
                         <detallista:Amount t-raw="'{0:.2f}'.format(float(amount_total) or 0.0)"/>
+                        </t>
                     </detallista:totalAmount>
                     <detallista:TotalAllowanceCharge
                         allowanceOrChargeType="ALLOWANCE">
