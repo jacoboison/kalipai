@@ -99,7 +99,7 @@
                         <t t-if="record.partner_id.tipo_folio=='DQ'">
                         <detallista:referenceIdentification
                             type="DQ"
-                            t-raw="record.name or record.number"/>
+                            t-raw="values[2].lstrip()"/>
                         </t>
                         <!-- Sale order identifications -->
                         <t t-foreach="identification" t-as="record.invoice_origin.split(',') if record.invoice_origin else []">
