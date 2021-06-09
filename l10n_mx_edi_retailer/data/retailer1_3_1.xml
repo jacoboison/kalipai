@@ -289,7 +289,7 @@
                                 <detallista:Amount t-raw="'{0:.2f}'.format(subtotal_wo_discount(line)/(line.quantity or 1.0) or 0.0)"/>
                             </detallista:grossPrice>
                             <detallista:netPrice>
-                                <detallista:Amount t-raw="'{0:.2f}'.format((line.price_total/(line.quantity or 1.0))*(1-(line.discount/100)) or 0.0)"/>
+                                <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*(1-(line.discount/100)) or 0.0)"/>
                             </detallista:netPrice>
                             <t t-if="record.partner_id.mostrar_ad_inf">
                             <detallista:AdditionalInformation
