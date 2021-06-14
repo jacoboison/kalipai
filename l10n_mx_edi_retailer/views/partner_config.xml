@@ -12,6 +12,13 @@
                     <field name="tipo_folio"/>
                     <field name="tipo_ref_supplier"/>
                     <field name="mostrar_currency"/>
+
+                    <field name="mostrar_aab"/>
+                    <field name="mostrar_shipto"/>
+                    <field name="mostrar_term_pago"/>
+                    <field name="mostrar_seq_number"/>
+                    <field name="mostrar_ad_inf"/>
+                    <field name="total_sin_descimp"/>
                     
                  </group>
                  </page>
