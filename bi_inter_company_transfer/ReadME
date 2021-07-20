@@ -1,0 +1,6 @@
+date 24/05/21
+version 13.0.0.1
+issue solve:-
+	- module flow is working wrong , update warehouse details , also auto picking/receipt not generate/validated automatically, auto Invoice/ bill generate time getting traceback
+
+=> 13.0.0.2 : Improved an index with video as per latest changes.
