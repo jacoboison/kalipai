@@ -12,20 +12,20 @@ class AccountInvoice(models.Model):
     _inherit = ['account.move']
 
 
-    mx_integritas_no_pedido=fields.Char(string="No Pedido",traslate=True)
+    mx_integritas_no_pedido=fields.Char(string="No Pedido",translate=True)
     mx_integritas_fecha_pedido=fields.Datetime(string='Fecha de Pedido')
-    mx_integritas_no_recepcion=fields.Char(string="No Recepcion",traslate=True)
+    mx_integritas_no_recepcion=fields.Char(string="No Recepcion",translate=True)
     mx_integritas_fecha_recepcion=fields.Datetime(string='Fecha de Recepcion')
-    mx_integritas_no_factura=fields.Char(string="No Factura",traslate=True)
+    mx_integritas_no_factura=fields.Char(string="No Factura",translate=True)
     mx_integritas_fecha_factura=fields.Datetime(string='Fecha de Factura')
-    mx_integritas_no_solicitud_pago=fields.Char(string="No Solicitud Pago",traslate=True)
+    mx_integritas_no_solicitud_pago=fields.Char(string="No Solicitud Pago",translate=True)
     mx_integritas_fecha_no_solic_pago=fields.Datetime(string='Fecha de Solicitud Pago')
-    mx_integritas_no_contrarecibo=fields.Char(string="No Contrarecibo",traslate=True)
+    mx_integritas_no_contrarecibo=fields.Char(string="No Contrarecibo",translate=True)
     mx_integritas_fecha_contrarecibo=fields.Date(string='Fecha de Contrarecibo')
 
-    mx_integritas_no_cita=fields.Char(string="No Cita",traslate=True)
-    mx_integritas_exp=fields.Boolean(string="Extemporaneo",traslate=True)
-    mx_integritas_cons=fields.Boolean(string="Consolidado",traslate=True)
+    mx_integritas_no_cita=fields.Char(string="No Cita",translate=True)
+    mx_integritas_exp=fields.Boolean(string="Extemporaneo",translate=True)
+    mx_integritas_cons=fields.Boolean(string="Consolidado",translate=True)
     mx_integritas_emp = fields.Selection([
         ('1', 'Cajas'),
         ('2', 'Bultos'),
