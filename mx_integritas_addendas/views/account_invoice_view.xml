@@ -21,7 +21,6 @@
         
                     <field name="mx_integritas_no_cita"/>
 
-                    <field name="mx_integritas_exp"/>
                     <field name="mx_integritas_cons"/>
                     <field name="mx_integritas_emp"/>
                     <field name="mx_integritas_no_contrarecibo"/>

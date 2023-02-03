@@ -24,7 +24,7 @@ class AccountInvoice(models.Model):
     mx_integritas_fecha_contrarecibo=fields.Date(string='Fecha de Contrarecibo')
 
     mx_integritas_no_cita=fields.Char(string="No Cita",translate=True)
-    mx_integritas_exp=fields.Boolean(string="Extemporaneo",translate=True)
+    #mx_integritas_exp=fields.Boolean(string="Extemporaneo",translate=True)
     mx_integritas_cons=fields.Boolean(string="Consolidado",translate=True)
     mx_integritas_emp = fields.Selection([
         ('1', 'Cajas'),
