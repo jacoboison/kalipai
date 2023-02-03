@@ -13,12 +13,13 @@ import odoo.addons.decimal_precision as dp
 
 class InterTransferCompany(models.Model):
     _name = 'inter.transfer.company'
+    _description="InterTransferCompany"
     _order = 'create_date desc, id desc'
 
     @api.depends('invoice_id')
     def _get_invoiced(self):
         for internal in self:
-            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('type', '=','out_invoice')])
+            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('move_type', '=','out_invoice')])
             if internal_transfer:
                 internal.invoice_count = len(internal_transfer)
 
@@ -27,7 +28,7 @@ class InterTransferCompany(models.Model):
 
         for internal in self:
 
-            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('type', '=','in_invoice')])
+            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('move_type', '=','in_invoice')])
             
             if internal_transfer:
                 internal.bill_count = len(internal_transfer)
@@ -54,14 +55,14 @@ class InterTransferCompany(models.Model):
                 internal.purchase_count = len(self.purchase_id)
 
     def action_view_sale_internal(self):
-        action = self.env.ref('sale.action_orders').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("sale.action_orders")
         domain = [('id', '=', self.sale_id.id)]
         transfer = self.env['sale.order'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
         return action
 
     def action_view_return_internal(self):
-        action = self.env.ref('bi_inter_company_transfer.return_inter_company_transfer_action').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("bi_inter_company_transfer.return_inter_company_transfer_action")
         domain = [('id', '=', self.return_id.id)]
         transfer = self.env['return.inter.transfer.company'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
@@ -69,50 +70,58 @@ class InterTransferCompany(models.Model):
 
     def action_view_invoice_internal(self):
         imd = self.env['ir.model.data']
-        action = imd.xmlid_to_object('account.action_move_out_invoice_type')
-        list_view_id = imd.xmlid_to_res_id('account.view_invoice_tree')
-        form_view_id = imd.xmlid_to_res_id('account.view_move_form')
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        list_view_id = imd._xmlid_to_res_id('account.view_invoice_tree')
+        form_view_id = imd._xmlid_to_res_id('account.view_move_form')
         result = {      
             
-                        'name': action.name,
-                        'help': action.help,
-                        'type': action.type,
+                        'name': action['name'],
+                        'help': action['help'],
+                        'type': action['type'],
                         'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
-                        'target': action.target,
-                        'context': action.context,
-                        'res_model': action.res_model,
+                        'target': action['target'],
+                        'context': action['context'],
+                        'res_model': action['res_model'],
                     }
         for invoice in self.invoice_id:
-            if invoice.type == 'out_invoice':
+            if invoice.move_type == 'out_invoice':
                 result['domain'] = "[('id','in',%s)]" % invoice.ids
                 return result
 
     def action_view_invoice_internal_bill(self):
         imd = self.env['ir.model.data']
-        action = imd.xmlid_to_object('account.action_move_in_invoice_type')
-        list_view_id = imd.xmlid_to_res_id('account.view_invoice_tree')
-        form_view_id = imd.xmlid_to_res_id('account.view_move_form')
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_in_invoice_type")
+        list_view_id = imd._xmlid_to_res_id('account.view_invoice_tree')
+        form_view_id = imd._xmlid_to_res_id('account.view_move_form')
         result = {      
             
-                        'name': action.name,
-                        'help': action.help,
-                        'type': action.type,
+                        'name': action['name'],
+                        'help': action['help'],
+                        'type': action['type'],
                         'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
-                        'target': action.target,
-                        'context': action.context,
-                        'res_model': action.res_model,
+                        'target': action['target'],
+                        'context': action['context'],
+                        'res_model': action['res_model'],
                     }
         for invoice in self.invoice_id:
-            if invoice.type == 'in_invoice':
+            if invoice.move_type == 'in_invoice':
                 result['domain'] = "[('id','in',%s)]" % invoice.ids
                 return result
 
     def action_view_purchase_internal(self):
-        action = self.env.ref('purchase.purchase_form_action').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
         domain = [('id', '=', self.purchase_id.id)]
         transfer = self.env['purchase.order'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
-        return action               
+        return action    
+
+        #  def action_view_sale_internal(self):
+        # action = self.env.ref('sale.action_orders').read()[0]
+        # domain = [('id', '=', self.sale_id.id)]
+        # transfer = self.env['sale.order'].search(domain)
+        # action['domain'] = [('id', '=', transfer.id)]
+        # return action
+           
 
     sale_id = fields.Many2one("sale.order",string="Sale Order", copy=False)
     sale_count = fields.Integer('Sale Count',compute="_compute_sale_internal", copy=False, default=0, store=True)
@@ -134,13 +143,10 @@ class InterTransferCompany(models.Model):
     product_lines = fields.One2many('inter.transfer.company.line','internal_id',string="lines")
 
     def to_get_domain(self):
-        return [('company_id','!=',self.env.company.id)] 
+        return [('company_id','!=',self.env.company.id)]
 
     def from_get_domain(self):
         return [('company_id','=',self.env.company.id)]     
-
-   
-
 
     @api.model
     def create(self,vals):
@@ -206,7 +212,6 @@ class InterTransferCompany(models.Model):
         
         return self.write({'state':'process'})
 
-
     def createpurchaseorder(self):
         
         purchase_order = self.env['purchase.order'].create({
@@ -242,9 +247,8 @@ class InterTransferCompany(models.Model):
         When only one found, show the vendor bill immediately.
         '''
         # self.write({'state' : 'return'})
-        action = self.env.ref('bi_inter_company_transfer.action_return_form_template')
-        result = action.read()[0]
-
+        action = self.env["ir.actions.actions"]._for_xml_id("bi_inter_company_transfer.action_return_form_template")
+        result = action
         # override the context to get rid of the default filtering
         
         value = []
@@ -271,6 +275,7 @@ class InterTransferCompany(models.Model):
 
 class InterTransferCompanyLines(models.Model):
     _name = 'inter.transfer.company.line'
+    _description="InterTransferCompanyLines"
 
     internal_id = fields.Many2one('inter.transfer.company')
     product_id = fields.Many2one('product.product' , required = True)

@@ -9,6 +9,7 @@
     'description': """
         Long description of module's purpose
     """,
+    'license': 'LGPL-3',
 
     'author': "My Company",
     'website': "http://www.yourcompany.com",
@@ -27,7 +28,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
         'views/account_invoice_view.xml',
