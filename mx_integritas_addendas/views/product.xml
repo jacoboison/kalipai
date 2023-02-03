@@ -11,15 +11,6 @@
                 <group name="Datos Addenda">
                 <field name="mx_integritas_gln"/>
                 <field name="mx_integritas_ref"/>
-                <separator string="Datos Addenda Producto"/>
-                    <field name="datos_addenda_prod">
-                        <tree string="Datos Addenda Producto" editable="bottom" create="1" delete="1">
-                            <field name="product_id" invisible="1"/>
-                            <field name="name" force_save="1"/>
-                            <field name="ean" force_save="1"/>
-                            <field name="desc" force_save="1"/>
-                        </tree>
-                    </field> 
                 </group>
                 </page>
                             
@@ -35,19 +26,11 @@
             <xpath expr="//group[@name='weight']" position="after">
                 <group name="datos_dddenda" string="Datos Addenda">
                 <field name="mx_integritas_gln"/>
-                <field name="mx_integritas_ref"/>
-                <separator string="Datos Addenda Producto"/>
-                    <field name="datos_addenda_prod">
-                        <tree string="Datos Addenda Producto" editable="bottom" create="1" delete="1">
-                            <field name="product_id" invisible="1"/>
-                            <field name="name" force_save="1"/>
-                            <field name="ean" force_save="1"/>
-                            <field name="desc" force_save="1"/>
-                        </tree>
-                    </field>  
+                <field name="mx_integritas_gln"/>
+                
                 </group>              
             </xpath>
         </field>
     </record>
-    
+
 </odoo>

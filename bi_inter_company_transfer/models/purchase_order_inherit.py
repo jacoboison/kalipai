@@ -27,7 +27,7 @@ class PurchaseOrderInherit(models.Model):
 
 
     def action_view_internal(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("bi_inter_company_transfer.stock_inter_company_transfer_action")
+        action = self.env.ref('bi_inter_company_transfer.stock_inter_company_transfer_action').read()[0]
         domain = [('id', '=', self.internal_id.id)]
         transfer = self.env['inter.transfer.company'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
@@ -40,7 +40,7 @@ class PurchaseOrderInherit(models.Model):
         setting_id = self.env.company
         invoice_object = self.env['account.move']
         invoice_line_obj = self.env['account.move.line']
-        journal = self.env['account.journal'].sudo().search([('type', '=', 'purchase'),('company_id','=',self.env.company.id)], limit=1)
+        journal = self.env['account.journal'].search([('type', '=', 'purchase'),('company_id','=',self.env.company.id)], limit=1)
         internal_id  =  self.env['inter.transfer.company']
         inter_transfer_lines = self.env['inter.transfer.company.line']
         inter_lines = []
@@ -48,84 +48,76 @@ class PurchaseOrderInherit(models.Model):
         create_invoice = False
         validate_invoice = False
         bill_id =  False
-        line_lot=[]
         if self.env.user.has_group('bi_inter_company_transfer.group_ict_manager_access') and setting_id.allow_auto_intercompany:
+            
             if company_partner_id.id:
                 if not so_available.id:
                     if setting_id.validate_picking:
-                        for line in self.order_line :
-                            if line.product_id.tracking != 'none':
-                                line_lot.append(line.product_id)
                         for receipt in self.picking_ids:           
                             for move in receipt.move_ids_without_package:
                                 move.write({'quantity_done':move.product_uom_qty}) 
+
                                 if self.internal_id.id == False and self.partner_ref == False:
                                     data = inter_transfer_lines.create({
                                                                         'product_id' : move.product_id.id,
                                                                         'quantity' : move.product_uom_qty,
                                                                         'price_unit' : move.product_id.lst_price
                                                                         })      
-                                    inter_lines.append(data)                       
-                            if not line_lot:                   
-                                receipt._action_done()
-                            else:
-                                receipt.action_confirm()
-                            for move in receipt.move_ids_without_package:
-                                if move.account_move_ids:
-                                    for entry in move.account_move_ids:
-                                        entry.write({'partner_id':move.partner_id.id})
-
+                                    inter_lines.append(data)                                 
+                            receipt.action_done()
                             if receipt.state == 'done':
                                 picking_access = True
                     else :
                         for receipt in self.picking_ids:           
                             for move in receipt.move_ids_without_package:
+                                
+
                                 if self.internal_id.id == False and self.partner_ref == False:
                                     data = inter_transfer_lines.create({
                                                                         'product_id' : move.product_id.id,
                                                                         'quantity' : move.product_uom_qty,
                                                                         'price_unit' : move.product_id.lst_price
                                                                         })          
-                                    inter_lines.append(data)                                         
+                                    inter_lines.append(data)                               
+                            
                     if setting_id.create_invoice:
                         if setting_id.create_invoice:
                             ctx = dict(self._context or {})
+
                             ctx.update({
-                                'move_type': 'in_invoice',
+                                'type': 'in_invoice',
                                 'default_purchase_id': self.id,
                                 'default_currency_id': self.currency_id.id,
-                                'default_invoice_origin' : self.name,
+                                'default_origin' : self.name,
                                 'default_ref' : self.name,
                                 })
                             bill_id = invoice_object.with_context(ctx).create({'partner_id': self.partner_id.id,
                                                         'currency_id':self.currency_id.id,
                                                         'company_id':self.company_id.id,
-                                                        'move_type': 'in_invoice',
-                                                        # 'journal_id':journal.id,
+                                                        'type': 'in_invoice',
+                                                        'journal_id':journal.id,
                                                         'purchase_vendor_bill_id' : self.id,
                                                         'purchase_id':self.id,
                                                         'ref':self.name})
+                            
                             new_lines = self.env['account.move.line']
                             new_lines = []
                             for line in self.order_line.filtered(lambda l: not l.display_type):
-                                if line.qty_to_invoice != 0.0:
-                                    new_lines.append((0,0,line._prepare_account_move_line(bill_id)))                      
-                                else:
-                                    raise UserError(_('There is no invoiceable line. If a product has a control policy based on received quantity, please make sure that a quantity has been received.'))
-                                    
+                                new_lines.append((0,0,line._prepare_account_move_line(bill_id)))                      
                             bill_id.write({
                                 'invoice_line_ids' : new_lines,
-                                'purchase_id' : False,
-                                'invoice_date' : bill_id.date
+                                'purchase_id' : False
                                 })   
-                            bill_id.invoice_payment_term_id = self.payment_term_id
-                            bill_id.invoice_origin = ', '.join(self.mapped('name'))
+                            bill_id.payment_term_id = self.payment_term_id
+                            bill_id.origin = ', '.join(self.mapped('name'))
                             bill_id.ref = ', '.join(self.filtered('partner_ref').mapped('partner_ref')) or bill_id.ref
                     if setting_id.validate_invoice:
                         if bill_id:
-                            bill_id._post()  
+                            bill_id.post()  
                         else:
-                            raise ValidationError(_('Please First give access to Create Bill.'))
+
+                            raise Warning(_('Please First give access to Create Bill.'))
+                    
                     if self.internal_id.id == False and self.partner_ref == False:
                         if bill_id :
                             internal_transfer_id = internal_id.create({
@@ -147,6 +139,7 @@ class PurchaseOrderInherit(models.Model):
                                                                     'apply_type':'sale',
                                                                     'currency_id':self.currency_id.id,
                                                                     'to_warehouse':self.picking_type_id.warehouse_id.id})
+
                             self.internal_id = internal_transfer_id.id
                             for i in inter_lines:
                                 i.update({
@@ -156,11 +149,8 @@ class PurchaseOrderInherit(models.Model):
                         created_id = internal_id.search([('id','=',self.internal_id.id)])
                         created_id.write({
                             'purchase_id':self.id,
+                            'invoice_id' :[(6 , 0 , bill_id.ids)]
                             })
-                        if bill_id:
-                            created_id.write({
-                                'invoice_id' :[(6 , 0 , bill_id.ids)]
-                                })
                     if self.internal_id.id:
                         self.internal_id = self.internal_id.id
                     
@@ -168,13 +158,16 @@ class PurchaseOrderInherit(models.Model):
                 if company_partner_id.id:
                     if self._context.get('stop_so') == True :
                         pass
+
                     else :
+
                         receipt  = self._create_so_from_po(company_partner_id)
         
         return True
 
 
     def _create_so_from_po(self , company):
+        self = self.with_context(force_company=company.id, company_id=company.id)
         company_partner_id = self.env['res.company'].search([('partner_id','=',self.partner_id.id)])
         current_company_id = self.env.company
         sale_order = self.env['sale.order']
@@ -182,37 +175,32 @@ class PurchaseOrderInherit(models.Model):
         invoice = False
         setting_id = self.env.company
         sale_order_line = self.env['sale.order.line']
-        line_lot = []
         allowed_company_ids = [company_partner_id.id , current_company_id.id]
         so_vals = self.sudo().get_so_values(self.name , company_partner_id , current_company_id)
         so_id = sale_order.with_context(allowed_company_ids=allowed_company_ids).sudo().create(so_vals)
         for line in self.order_line.sudo():
-            if line.product_id.tracking != 'none':
-                line_lot.append(line.product_id)
             so_line_vals = self.sudo().get_so_line_data(company_partner_id , so_id.id , line)
             sale_order_line.with_context(allowed_company_ids=allowed_company_ids).sudo().create(so_line_vals)
         if so_id.client_order_ref:
             so_id.client_order_ref = self.name
+            so_id.partner_ref = self.name
         ctx = dict(self._context or {})
         ctx.update({
             'company_partner_id':company_partner_id.id,
             'current_company_id':current_company_id.id
             })
-        so_id.with_context(allowed_company_ids=allowed_company_ids).action_confirm()
-        
+        so_id.with_context(allowed_company_ids=allowed_company_ids ,force_company = company_partner_id.id).action_confirm()
         if setting_id.validate_picking:
             for picking  in so_id.picking_ids:
                 for move in picking.move_ids_without_package:
                     move.write({'quantity_done':move.product_uom_qty,
                                 'product_uom_qty' : move.product_uom_qty})
-                if not line_lot:
-                    picking._action_done()
-                else:
-                    picking.action_confirm()
+
+                picking.action_done()
                 if picking.state == 'done':
                     picking_validate = True
         if setting_id.create_invoice:
-            invoice = so_id.order_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('out_invoice', 'out_refund'))
+            invoice = so_id.order_line.invoice_lines.move_id.filtered(lambda r: r.type in ('out_invoice', 'out_refund'))
             if not invoice:
                 invoice = so_id.sudo()._create_invoices()
 
@@ -224,7 +212,10 @@ class PurchaseOrderInherit(models.Model):
                 else:
                     invoice_id = invoice
             else:
-                raise ValidationError(_('Please First give access to Create invoice.'))                             
+                raise Warning(_('Please First give access to Create invoice.'))   
+                            
+        setting_id = self.env['res.config.settings'].search([],order="id desc", limit=1)
+        
         if self.internal_id.id:
             if setting_id.validate_invoice:
                 bill_details = []
@@ -252,9 +243,10 @@ class PurchaseOrderInherit(models.Model):
 
     @api.model
     def get_so_line_data(self, company, sale_id,line):
+        
         fpos = line.order_id.fiscal_position_id or line.order_id.partner_id.property_account_position_id
         taxes = line.product_id.taxes_id.filtered(lambda r: not line.company_id or r.company_id == company)
-        tax_ids = fpos.map_tax(taxes) if fpos else taxes            
+        tax_ids = fpos.map_tax(taxes, line.product_id, line.order_id.partner_shipping_id) if fpos else taxes            
         quantity = line.product_uom._compute_quantity(line.product_qty, line.product_id.uom_id)
         
         price = line.price_unit or 0.0
@@ -272,10 +264,17 @@ class PurchaseOrderInherit(models.Model):
         }
 
     def get_so_values(self ,name , company_partner_id , current_company_id):
+        # warehouse_id = self.env['stock.warehouse'].search([('company_id','=',current_company_id.id)],limit=1)
+        # current_cmp_warehouse = self.env['stock.warehouse'].search([('company_id','=',current_company_id.id)], limit =1 )
         if company_partner_id :
             if not company_partner_id.intercompany_warehouse_id :
-                raise ValidationError(_('Please Select Intercompany Warehouse On  %s.')%company_partner_id.name) 
-        so_name = self.env['ir.sequence'].sudo().with_company(company_partner_id).next_by_code('sale.order') or '/'
+                
+                raise Warning(_('Please Select Intercompany Warehouse On  %s.')%company_partner_id.name) 
+        # other_cmp_warehouse = company_partner_id.intercompany_warehouse_id
+        # picking_type_id = self.env['stock.picking.type'].search([
+        #     ('code', '=', 'internal'), ('default_location_src_id', '=', current_cmp_warehouse.lot_stock_id.id),('default_location_dest_id', '=', other_cmp_warehouse.lot_stock_id.id) 
+        # ], limit=1) 
+        so_name = self.env['ir.sequence'].sudo().next_by_code('sale.order') or '/'
         if self.internal_id.id:
             if self.internal_id.pricelist_id.id:
                 pricelist_id = self.internal_id.pricelist_id.id
@@ -298,31 +297,5 @@ class PurchaseOrderInherit(models.Model):
             'internal_id' :self.internal_id.id,
             'partner_shipping_id': current_company_id.intercompany_warehouse_id.partner_id.id
         }
-
-class AccountMoveInherit(models.Model):
-    _inherit = 'account.move'
-
-    def button_create_landed_costs(self):
-        """Create a `stock.landed.cost` record associated to the account move of `self`, each
-        `stock.landed.costs` lines mirroring the current `account.move.line` of self.
-        """
-        self.ensure_one()
-        landed_costs_lines = self.line_ids.filtered(lambda line: line.is_landed_costs_line)
-
-        landed_costs = self.env['stock.landed.cost'].with_company(self.company_id.id).create({
-            'vendor_bill_id': self.id,
-            'cost_lines': [(0, 0, {
-                'product_id': l.product_id.id,
-                'name': l.product_id.name,
-                'account_id': l.product_id.product_tmpl_id.get_product_accounts()['stock_input'].id,
-                'price_unit': l.currency_id._convert(l.price_subtotal, l.company_currency_id, l.company_id, l.move_id.date),
-                'split_method': l.product_id.split_method_landed_cost or 'equal',
-            }) for l in landed_costs_lines],
-        })
-        action = self.env["ir.actions.actions"]._for_xml_id("stock_landed_costs.action_stock_landed_cost")
-        return dict(action, view_mode='form', res_id=landed_costs.id, views=[(False, 'form')])
-
-
-
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

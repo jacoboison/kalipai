@@ -6,4 +6,3 @@ from . import res_partner
 from . import sales
 from . import stock_picking
 from . import product
-from . import datos_addenda_prod

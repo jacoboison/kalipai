@@ -18,17 +18,17 @@ class Picking(models.Model):
     _name = "stock.picking"
     _inherit = ['stock.picking']
 
-    mx_integritas_refprov=fields.Char(string="Referencia",translate=True)
+    mx_integritas_refprov=fields.Char(string="Referencia",traslate=True)
 
     scheduled_date = fields.Datetime(
         'Scheduled Date', compute='_compute_scheduled_date', inverse='_set_scheduled_date', store=True,
-        index=True, tracking=True,
+        index=True, track_visibility='onchange',
         help="Scheduled time for the first part of the shipment to be processed. Setting manually a value here would set it as expected date for all the stock moves.")
 
-    mx_integritas_sem=fields.Integer(string="Semana",compute='_set_calculo_semana')
-    mx_integritas_no_orden_rem=fields.Char(string="no_orden",compute='_set_datos_po')
+    mx_integritas_sem=fields.Integer(String="Semana",compute='_set_calculo_semana')
+    mx_integritas_no_orden_rem=fields.Char(String="no_orden",compute='_set_datos_po')
 
-    mx_integritas_forem=fields.Char(string="Fecha Orden",compute='_set_datos_po')
+    mx_integritas_forem=fields.Char(String="Fecha Orden",compute='_set_datos_po')
     
     
     

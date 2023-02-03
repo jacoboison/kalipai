@@ -7,25 +7,45 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
              <xpath expr="//page[last()]" position="before"> 
-                <page string="Datos Addenda" name="Datos Addenda">
+                <page string="Datos Addenda" name="Datos Addenda" attrs="{'invisible': [('mx_integritas_show_datos_addenda', '=', False)]}">
                 <group name="Datos Addenda">
                     
 
-                    <field name="mx_integritas_no_pedido"/>
-                    
-                    <field name="mx_integritas_fecha_pedido"/> 
-                    
-                    <field name="mx_integritas_no_recepcion"/>
-                   
-                    <field name="mx_integritas_fecha_recepcion"/>
-        
-                    <field name="mx_integritas_no_cita"/>
+                    <field name="mx_integritas_no_pedido" attrs="{'invisible':['|',('mx_integritas_hide_no_pedido', '=', True),('mx_integritas_hide_no_pedido_auto', '=', True)]}"/>
+                    <field name="mx_integritas_no_pedido_auto"  attrs="{'invisible':[('mx_integritas_hide_no_pedido_auto', '=', False)]}"/>
+                    <field name="mx_integritas_fecha_pedido" attrs="{'invisible':['|',('mx_integritas_hide_fecha_pedido', '=', True),('mx_integritas_hide_fecha_pedido_auto', '=', True)]}"/> 
+                    <field name="mx_integritas_fecha_pedido_auto"  attrs="{'invisible':[('mx_integritas_hide_fecha_pedido_auto', '=', False)]}"/>
+                    <field name="mx_integritas_no_recepcion" attrs="{'invisible':['|',('mx_integritas_hide_no_recepcion', '=', True),('mx_integritas_hide_no_recepcion_auto', '=', True)]}" />
+                    <field name="mx_integritas_no_recepcion_auto"  attrs="{'invisible':[('mx_integritas_hide_no_recepcion_auto', '=', False)]}"/>
+                    <field name="mx_integritas_fecha_recepcion" attrs="{'invisible':['|',('mx_integritas_hide_fecha_recepcion', '=', True),('mx_integritas_hide_fecha_recepcion_auto', '=', True)]}"/>
+                    <field name="mx_integritas_fecha_recepcion_auto" attrs="{'invisible':[('mx_integritas_hide_fecha_recepcion_auto', '=', False)]}"/>
+                    <field name="mx_integritas_no_cita"  attrs="{'invisible':[('mx_integritas_hide_no_cita', '=', True)]}"/>
+                    <field name="mx_integritas_no_contrarecibo"  attrs="{'invisible':[('mx_integritas_hide_no_contrarecibo', '=', True)]}"/>
 
-                    <field name="mx_integritas_cons"/>
-                    <field name="mx_integritas_emp"/>
+                    <!--<field name="mx_integritas_no_factura" attrs="{'invisible':[('mx_integritas_hide_no_factura', '=', True)]}"/>
+                    <field name="mx_integritas_fecha_factura"/>
+                    <field name="mx_integritas_no_solicitud_pago"/>
+                    <field name="mx_integritas_fecha_no_solic_pago"/>
                     <field name="mx_integritas_no_contrarecibo"/>
+                    <field name="mx_integritas_fecha_contrarecibo"/>-->
 
+                    <field name="mx_integritas_show_datos_addenda" attrs="{'invisible':True}"/>
                     
+                    <field name="mx_integritas_hide_no_pedido" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_fecha_pedido" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_no_recepcion" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_fecha_recepcion" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_no_factura" attrs="{'invisible':True}"/>
+
+                    <field name="mx_integritas_hide_no_pedido_auto" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_fecha_pedido_auto" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_no_recepcion_auto" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_fecha_recepcion_auto" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_no_cita" attrs="{'invisible':True}"/>
+                    <field name="mx_integritas_hide_no_contrarecibo" attrs="{'invisible':True}"/>
+
+                    <!--<field name="mx_integritas_montoiva"/>
+                    <field name="mx_integritas_montoieps"/>-->
                  </group>
                  </page>
               </xpath>        

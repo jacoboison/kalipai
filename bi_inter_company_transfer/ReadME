@@ -1,11 +1,6 @@
-15.0.0.1 ==>fixed issue of traceback for tax when fiscal position is selected
-15.0.0.2 ==>fixed issue of traceback for bill.
-15.0.0.3 ==>fixed issue of action in all smart buttons.
-15.0.0.4 ==>fixed issue of sequence and stock when sale order created from purchase and Auto Validate Delivery/Receipt is true.
+date 24/05/21
+version 13.0.0.1
+issue solve:-
+	- module flow is working wrong , update warehouse details , also auto picking/receipt not generate/validated automatically, auto Invoice/ bill generate time getting traceback
 
-=> 15.0.0.5 : Add French, Spanish , Arabic and Dutch translation in module also improved an index.
-
-15.0.0.6 ==>1.fixed issue of inter company transfer when product tracking is lot/serial.
-			2.fixed issue of bill quantity when bill automatically created on the confirmation from sale.
-15.0.0.7 ==>fixed issue of warnings in Reverse InterCompany Transaction.
-15.0.0.8 ==>fixed issue of stock landed cost multi company.
+=> 13.0.0.2 : Improved an index with video as per latest changes.
