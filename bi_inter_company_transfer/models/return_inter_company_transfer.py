@@ -18,7 +18,7 @@ class ReturnPickingLine(models.Model):
     _rec_name = 'product_id'
 
     product_id = fields.Many2one('product.product', string="Product",  domain="[('id', '=', product_id)]")
-    quantity = fields.Float("Quantity", digits=dp.get_precision('Product Unit of Measure'))
+    quantity = fields.Float("Quantity", digits='Product Unit of Measure')
     uom_id = fields.Many2one('product.uom', string='Unit of Measure', related='move_id.product_uom')
     wizard_id = fields.Many2one('return.inter.transfer.company', string="Wizard")
     move_id = fields.Many2one('stock.move', "Move")
