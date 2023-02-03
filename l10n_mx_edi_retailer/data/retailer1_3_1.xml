@@ -217,7 +217,7 @@
                             </detallista:tradeItemDescriptionInformation>
                             <detallista:invoicedQuantity t-att-unitOfMeasure="line.product_uom_id.name" t-raw="'{0:.0f}'.format(line.quantity or 0.0)"/>
                             <detallista:grossPrice>
-                                <detallista:Amount t-raw="'{0:.2f}'.format(line_values['gross_price_total_unit']/(line.quantity or 1.0) or 0.0)"/>
+                                <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity or 0.0)"/>
                             </detallista:grossPrice>
                             <detallista:netPrice>
                                 <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*(1-(line.discount/100)) or 0.0)"/>
@@ -225,7 +225,7 @@
                             
                             <detallista:totalLineAmount>
                                 <detallista:grossAmount>
-                                    <detallista:Amount t-raw="'{0:.2f}'.format(line_values['gross_price_total_unit']  or 0.0)"/>
+                                    <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity  or 0.0)"/>
                                 </detallista:grossAmount>
                                 <detallista:netAmount>
                                     <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity*(1-(line.discount/100))  or 0.0)"/>
