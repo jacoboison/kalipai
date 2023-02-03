@@ -88,7 +88,7 @@
         <field name="ttype">selection</field>
         <field name="help">Informacion Tipo Descuento</field>
         <field name="model_id" ref="model_l10n_mx_edi_retailer_wizard"/>
-        <field name="selection">[('OFF_INVOICE', 'Fuera de Factura'),('BLACK_INVOICE', 'Reclamacíon')]</field>
+        <field name="selection">[('OFF_INVOICE', 'Fuera de Factura'),('BILL_BACK', 'Reclamacíon')]</field>
     </record>
 
     <!--Fields in invoice-->

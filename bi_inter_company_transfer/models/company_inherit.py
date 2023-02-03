@@ -6,6 +6,7 @@ from odoo import api, fields, models, _
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
+    _description="ResCompany"
 
     intercompany_warehouse_id = fields.Many2one('stock.warehouse',string="Intercompany Warehouse")
     validate_picking = fields.Boolean('Validate Receipt/picking in so/po ' , default = False)
