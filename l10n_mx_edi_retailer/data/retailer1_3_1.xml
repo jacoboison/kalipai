@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="retailer" inherit_id="l10n_mx_edi_40.cfdiv40">
+    <template id="retailer" inherit_id="l10n_mx_edi.cfdiv33">
         <xpath expr="*" position="inside">
             <cfdi:Complemento xmlns:cfdi="http://www.sat.gob.mx/cfd/4" t-if="record.x_complement_retailer_data">
                 <t t-set="values" t-value="(record.x_complement_retailer_data or '|').split('|')"/>
