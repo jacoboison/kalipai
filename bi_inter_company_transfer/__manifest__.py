@@ -3,7 +3,7 @@
 
 {
     "name" : "Auto Inter-Company Transfer-Transection App ",
-    "version" : "13.0.0.2",
+    "version" : "15.0.0.8",
     "category" : "Warehouse",
     'summary': 'Auto Inter company Transfer document Auto intercompany transfer document auto intercompany transection automatic inter-company Transection inter company rules setup for multiple company inter company sales inter company purchase inter-company warehouse',
     "description": """
@@ -23,7 +23,7 @@
     "website" : "https://www.browseinfo.in",
     "price": 69,
     "currency": 'EUR',
-    "depends" : ['base','sale_management','purchase','stock','account','sale_stock'],
+    "depends" : ['base','sale_management','purchase','stock','account','sale_stock','stock_landed_costs'],
     "data": [
             'security/int_security.xml',
             'security/ir.model.access.csv',
@@ -34,6 +34,7 @@
             'views/company_inherit_views.xml',
             ],
     'qweb': [],
+    "license": 'LGPL-3',
     "auto_install": False,
     "installable": True,
     "live_test_url":'https://youtu.be/oZ07noG3YxQ',

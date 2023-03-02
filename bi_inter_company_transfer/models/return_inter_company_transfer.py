@@ -14,16 +14,18 @@ import odoo.addons.decimal_precision as dp
 
 class ReturnPickingLine(models.Model):
     _name = "stock.return.picking.inter.company"
+    _description="ReturnPickingLine"
     _rec_name = 'product_id'
 
     product_id = fields.Many2one('product.product', string="Product",  domain="[('id', '=', product_id)]")
-    quantity = fields.Float("Quantity", digits=dp.get_precision('Product Unit of Measure'))
+    quantity = fields.Float("Quantity", digits='Product Unit of Measure')
     uom_id = fields.Many2one('product.uom', string='Unit of Measure', related='move_id.product_uom')
     wizard_id = fields.Many2one('return.inter.transfer.company', string="Wizard")
     move_id = fields.Many2one('stock.move', "Move")
 
 class ReturnInterTransferCompany(models.Model):
     _name = 'return.inter.transfer.company'
+    _description="ReturnInterTransferCompany"
     _order = 'create_date desc, id desc'
 
     @api.depends('internal_id')
@@ -36,7 +38,7 @@ class ReturnInterTransferCompany(models.Model):
     @api.depends('invoice_id')
     def _get_invoiced(self):
         for internal in self:
-            internal_transfer = self.env['account.move'].search([('id','in',self.invoice_id.ids),('type', 'in', ['out_refund'])])
+            internal_transfer = self.env['account.move'].search([('id','in',self.invoice_id.ids),('move_type', 'in', ['out_refund'])])
             if internal_transfer:
                 internal.invoice_count = len(internal_transfer)
 
@@ -44,7 +46,7 @@ class ReturnInterTransferCompany(models.Model):
     def _get_bill(self):
 
         for internal in self:
-            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('type', '=','in_refund')])
+            internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('move_type', '=','in_refund')])
             if internal_transfer:
                 internal.bill_count = len(internal_transfer)
                 
@@ -94,14 +96,14 @@ class ReturnInterTransferCompany(models.Model):
         return res
 
     def action_view_sale_internal(self):
-        action = self.env.ref('sale.action_orders').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("sale.action_orders")
         domain = [('id', '=', self.sale_id.id)]
         transfer = self.env['sale.order'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
         return action
 
     def action_view_internal(self):
-        action = self.env.ref('bi_inter_company_transfer.stock_inter_company_transfer_action').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("bi_inter_company_transfer.stock_inter_company_transfer_action")
         domain = [('id', '=', self.internal_id.id)]
         transfer = self.env['inter.transfer.company'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
@@ -109,31 +111,31 @@ class ReturnInterTransferCompany(models.Model):
 
     def action_view_invoice_internal(self):
         imd = self.env['ir.model.data']
-        action = imd.xmlid_to_object('account.action_move_out_invoice_type')
-        list_view_id = imd.xmlid_to_res_id('account.view_invoice_tree')
-        form_view_id = imd.xmlid_to_res_id('account.view_move_form')
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        list_view_id = imd._xmlid_to_res_id('account.view_invoice_tree')
+        form_view_id = imd._xmlid_to_res_id('account.view_move_form')
         result = {      
             
-                        'name': action.name,
-                        'help': action.help,
-                        'type': action.type,
+                        'name': action['name'],
+                        'help': action['help'],
+                        'type': action['type'],
                         'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
-                        'target': action.target,
-                        'context': action.context,
-                        'res_model': action.res_model,
+                        'target': action['target'],
+                        'context': action['context'],
+                        'res_model': action['res_model'],
                     }
         result['domain'] = "[('id','in',%s)]" % self.invoice_id.ids
         return result
 
     def action_view_invoice_internal_bill(self):
-        action = self.env.ref('account.action_vendor_bill_template').read()[0]
-        domain = [('id', 'in', self.invoice_id.ids),('type', '=', 'in_refund')]
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_vendor_bill_template")
+        domain = [('id', 'in', self.invoice_id.ids),('move_type', '=', 'in_refund')]
         transfer = self.env['account.move'].search(domain)
         action['domain'] = [('id', 'in', transfer.ids)]
         return action
 
     def action_view_purchase_internal(self):
-        action = self.env.ref('purchase.purchase_form_action').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
         domain = [('id', '=', self.purchase_id.id)]
         transfer = self.env['purchase.order'].search(domain)
         action['domain'] = [('id', '=', transfer.id)]
@@ -167,10 +169,12 @@ class ReturnInterTransferCompany(models.Model):
         description = False
         mode = 'refund'
         for inv in inv_obj.browse(self.internal_id.invoice_id.ids):
-            if inv.type == 'out_invoice':
+            if inv.move_type == 'out_invoice':
                 credit_note_wizard = self.env['account.move.reversal'].with_context({'active_ids': [inv.id], 'active_id': inv.id, 'active_model': 'account.move'}).create({
                     'refund_method': 'refund',  
                     'reason': 'reason test create',
+                    'journal_id': inv.journal_id.id,
+
                 })
                 credit_note_wizard.reverse_moves()
                 refund = inv.sorted(key=lambda inv: inv.id, reverse=False)[-1]
@@ -228,7 +232,8 @@ class ReturnInterTransferCompany(models.Model):
                     'state':'process',
                     'invoice_id':[(6 ,0 ,bill_details)]
                     })
-                refund.action_post()
+                if refund.state != 'posted':
+                    refund.action_post()
             
     def CreateBillCreditNote(self):
         inv_obj = self.env['account.move']
@@ -242,10 +247,11 @@ class ReturnInterTransferCompany(models.Model):
         description = False
         mode = 'refund'
         for inv in inv_obj.browse(self.internal_id.invoice_id.ids):
-            if inv.type == 'in_invoice':
+            if inv.move_type == 'in_invoice':
                 credit_note_wizard = self.env['account.move.reversal'].with_context({'active_ids': [inv.id], 'active_id': inv.id, 'active_model': 'account.move'}).create({
                     'refund_method': 'refund',  
                     'reason': 'reason test create',
+                    'journal_id': inv.journal_id.id,
                 })
                 credit_note_wizard.reverse_moves()
                 refund = inv.sorted(key=lambda inv: inv.id, reverse=False)[-1]
@@ -303,7 +309,8 @@ class ReturnInterTransferCompany(models.Model):
                     'state':'process',
                     'invoice_id':[(6 ,0 ,bill_details)]
                     })
-                refund.action_post()
+                if refund.state != 'posted':
+                    refund.action_post()
 
     def ReturnPicking(self):
 
@@ -447,9 +454,7 @@ class ReturnInterTransferCompany(models.Model):
                     self.write({'state':'process'})
 
     def revertorder(self):
-        
         if self.sale_id.id:
-            
             self.ReturnPicking()
             self.CreateInvoiceCreditNote()
             
@@ -462,6 +467,7 @@ class ReturnInterTransferCompany(models.Model):
 
 class ReturnInterTransferCompanyLines(models.Model):
     _name = 'return.inter.transfer.company.line'
+    _description="ReturnInterTransferCompanyLines"
 
     internal_id = fields.Many2one('inter.transfer.company')
     return_id = fields.Many2one('return.inter.transfer.company')

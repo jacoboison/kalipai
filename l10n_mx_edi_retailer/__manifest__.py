@@ -16,6 +16,7 @@
         "views/account_invoice_view.xml",
         "views/partner_config.xml",
         "views/product.xml",
+        "security/ir.model.access.csv",
     ],
     'installable': True,
     'auto_install': False,

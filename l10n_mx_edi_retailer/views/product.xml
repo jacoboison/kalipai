@@ -5,11 +5,11 @@
         <record model="ir.ui.view" id="view_prod_form_inh_l10n_mx_detallista">
             <field name="name">view.prod.form.inh.l10n.mx.detallista</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="account.product_template_form_view"/>
+            <field name="inherit_id" ref="product_unspsc.product_template_unspsc"/>
             <field name="arch" type="xml">
             <data>
                 
-                <xpath expr="//field[@name='l10n_mx_edi_code_sat_id']" position="after">
+                <xpath expr="//field[@name='unspsc_code_id']" position="after">
                     <field name="tipo_cod_detallista"/>
                     
                 </xpath>
