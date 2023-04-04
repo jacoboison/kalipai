@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="retailer" inherit_id="l10n_mx_edi.cfdiv33">
+    <template id="retailer" inherit_id="l10n_mx_edi_40.cfdiv40">
         <xpath expr="*" position="inside">
-            <cfdi:Complemento xmlns:cfdi="http://www.sat.gob.mx/cfd/3" t-if="record.x_complement_retailer_data">
+            <cfdi:Complemento xmlns:cfdi="http://www.sat.gob.mx/cfd/4" t-if="record.x_complement_retailer_data">
                 <t t-set="values" t-value="(record.x_complement_retailer_data or '|').split('|')"/>
                 <t t-set="lines" t-value="record.invoice_line_ids.filtered(lambda l: l.product_id)"/>
                 <t t-set="valuespr" t-value="record._set_datos_pedrem()"/>
@@ -217,7 +217,7 @@
                             </detallista:tradeItemDescriptionInformation>
                             <detallista:invoicedQuantity t-att-unitOfMeasure="line.product_uom_id.name" t-raw="'{0:.0f}'.format(line.quantity or 0.0)"/>
                             <detallista:grossPrice>
-                                <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity or 0.0)"/>
+                                <detallista:Amount t-raw="'{0:.2f}'.format(line_values['gross_price_total_unit']/(line.quantity or 1.0) or 0.0)"/>
                             </detallista:grossPrice>
                             <detallista:netPrice>
                                 <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*(1-(line.discount/100)) or 0.0)"/>
@@ -225,7 +225,7 @@
                             
                             <detallista:totalLineAmount>
                                 <detallista:grossAmount>
-                                    <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity  or 0.0)"/>
+                                    <detallista:Amount t-raw="'{0:.2f}'.format(line_values['gross_price_total_unit']  or 0.0)"/>
                                 </detallista:grossAmount>
                                 <detallista:netAmount>
                                     <detallista:Amount t-raw="'{0:.2f}'.format(line.price_unit*line.quantity*(1-(line.discount/100))  or 0.0)"/>
