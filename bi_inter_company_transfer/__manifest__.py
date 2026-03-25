@@ -3,7 +3,7 @@
 
 {
     "name" : "Auto Inter-Company Transfer-Transection App ",
-    "version" : "15.0.0.8",
+    "version" : "19.0.0.8",
     "category" : "Warehouse",
     'summary': 'Auto Inter company Transfer document Auto intercompany transfer document auto intercompany transection automatic inter-company Transection inter company rules setup for multiple company inter company sales inter company purchase inter-company warehouse',
     "description": """

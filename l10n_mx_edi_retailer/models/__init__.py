@@ -3,5 +3,5 @@
 from . import partner
 from . import product
 from . import invoice
-from . import account_edi_format
+##from . import account_edi_format
 

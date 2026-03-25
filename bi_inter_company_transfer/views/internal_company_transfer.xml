@@ -6,7 +6,7 @@
 		<field name="res_model">inter.transfer.company</field>
 		<field name="type">ir.actions.act_window</field>
 		<field name="binding_view_types">form</field>
-		<field name="view_mode">tree,form</field>
+		<field name="view_mode">list,form</field>
 		<field name="help" type="html">
 		  <p class="o_view_nocontent_smiling_face">
 			Create a new Inter Company Transaction
@@ -73,12 +73,12 @@
 					<notebook >
 						<page string="Product details">
 						  <field name="product_lines" attrs="{'readonly': [('state', 'in', ['process','return'])]}">
-							<tree editable="bottom" >
+							<list editable="bottom" >
 								<field name = "internal_id"  invisible="1"/>
 								<field name="product_id"/>
 								<field name="quantity"/>
 								<field name = "price_unit"/>
-							</tree>
+							</list>
 						  </field> 
 						</page>
 					</notebook>
@@ -91,14 +91,14 @@
 		<field name="name">inter.transfer.company.form</field>
 		<field name="model">inter.transfer.company</field>
 		<field name="arch" type="xml">
-			<tree string="tranfer details">
+			<list string="tranfer details">
 				<field name="name"/>
 				<field name = "from_warehouse"/>
 				<field name = "to_warehouse"/>
 				<field name="sale_id"/>
 				<field name="purchase_id"/>
 				<field name="state"/>
-			</tree>
+			</list>
 		</field>
 	</record>
 

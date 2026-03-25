@@ -4,6 +4,7 @@ from odoo.tools import DEFAULT_SERVER_TIME_FORMAT
 from pytz import timezone
 from pytz import utc
 import logging
+from collections import defaultdict
 
 _logger = logging.getLogger(__name__)
 
@@ -41,6 +42,31 @@ class AccountInvoice(models.Model):
         #values['date'] = datetime.combine(fields.Datetime.from_string(self.invoice_date), time_invoice).strftime('%Y-%m-%dT%H:%M:%S')
 
         return values
+    
+    def get_impuestos_totales(self,tipo):
+        
+        tax_grouped = defaultdict(float)
+        for record in self:
+            for line in record.invoice_line_ids:
+                subtotal = line.price_subtotal
+                for tax in line.tax_ids:
+                    if tipo == 'r':
+                        if tax.amount < 0:
+                            key = (tax.l10n_mx_tax_type, tax.amount)
+                            tax_grouped[key] += subtotal * tax.amount / 100
+                    else:
+                        if tax.amount >= 0:
+                            key = (tax.l10n_mx_tax_type, tax.amount)
+                            tax_grouped[key] += subtotal * tax.amount / 100
+        
+        tax_list = [
+            {'name': name, 'rate': rate, 'amount': amount}
+            for (name, rate), amount in tax_grouped.items()
+        ]
+        
+        return tax_list
+    
+    
 
     def _fecha_t(self,fecha,formato):
         localtimezone = timezone('UTC')

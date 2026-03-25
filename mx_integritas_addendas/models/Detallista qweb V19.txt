@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <template id="retailer" inherit_id="l10n_mx_edi.cfdiv40">
+<data inherit_id="l10n_mx_edi.cfdiv40">
         <xpath expr="//*[name()='cfdi:Comprobante']" position="inside">
             <cfdi:Complemento xmlns:cfdi="http://www.sat.gob.mx/cfd/4" t-if="detallista">
                 <!-- <t t-set="values" t-value="(record.x_complement_retailer_data or '|').split('|')"/> -->
@@ -257,6 +255,4 @@
                 </detallista:detallista>
             </cfdi:Complemento>
         </xpath>
-    </template>
-
-</odoo>
+    </data>
