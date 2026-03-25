@@ -3,7 +3,7 @@
 
 {
     "name" : "Auto Inter-Company Transfer-Transection App ",
-    "version" : "19.0.0.8",
+    "version" : "19.0.0.0",
     "category" : "Warehouse",
     'summary': 'Auto Inter company Transfer document Auto intercompany transfer document auto intercompany transection automatic inter-company Transection inter company rules setup for multiple company inter company sales inter company purchase inter-company warehouse',
     "description": """
@@ -19,11 +19,11 @@
             reverse intercompany transaction,
     
     """,
-    "author": "BrowseInfo",
-    "website" : "https://www.browseinfo.in",
-    "price": 69,
+    "author": "BROWSEINFO",
+    "website" : "https://www.browseinfo.com/demo-request?app=bi_inter_company_transfer&version=19&edition=Community",
+    "price": 99,
     "currency": 'EUR',
-    "depends" : ['base','sale_management','purchase','stock','account','sale_stock','stock_landed_costs'],
+    "depends" : ['base','sale_management','purchase','stock','account','sale_stock'],
     "data": [
             'security/int_security.xml',
             'security/ir.model.access.csv',
@@ -34,11 +34,11 @@
             'views/company_inherit_views.xml',
             ],
     'qweb': [],
-    "license": 'LGPL-3',
     "auto_install": False,
     "installable": True,
-    "live_test_url":'https://youtu.be/oZ07noG3YxQ',
-    "images":["static/description/Banner.png"],
+    'license': 'OPL-1',
+    "live_test_url":'https://www.browseinfo.com/demo-request?app=bi_inter_company_transfer&version=19&edition=Community',
+    "images":["static/description/Banner.gif"],
 }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

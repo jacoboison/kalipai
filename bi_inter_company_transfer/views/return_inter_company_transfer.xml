@@ -9,26 +9,26 @@
 			<form string="tranfer details" create="0" edit = "0">
 
 				<header>
-					 <button name="revertorder" string="process" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+					 <button name="revertorder" string="process" type="object" class="oe_highlight" invisible="state not in ('draft')"/>
 					<field name="state" widget="statusbar" statusbar_visible="draft,process"/>
 				</header>
 				<sheet>
 					<div class="oe_button_box" name="button_box">
-						<button name="action_view_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('internal_count', '=', 0)]}">
+						<button name="action_view_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "internal_count == 0">
 							<field name="internal_count" widget="statinfo" string="Internal Transfer"/>
 						</button>
-						<button name="action_view_sale_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('sale_count', '=', 0)]}">
+						<button name="action_view_sale_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "sale_count == 0">
 							<field name="sale_count" widget="statinfo" string="Sale Order"/>
 						</button>
-						<button name="action_view_invoice_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('invoice_count', '=', 0)]}">
+						<button name="action_view_invoice_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "invoice_count == 0">
 							<field name="invoice_count" widget="statinfo" string="Invoice"/>
 						</button>
 
-						<button name="action_view_invoice_internal_bill" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('bill_count', '=', 0)]}">
+						<button name="action_view_invoice_internal_bill" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "bill_count == 0">
 							<field name="bill_count" widget="statinfo" string="Bill"/>
 						</button>
 
-						<button name="action_view_purchase_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('purchase_count', '=', 0)]}">
+						<button name="action_view_purchase_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "purchase_count == 0">
 							<field name="purchase_count" widget="statinfo" string="Purchase Order"/>
 						</button>
 					</div>
@@ -39,27 +39,27 @@
 					</div>
 					<group>
 						<group>
-							<field name = "from_warehouse" attrs="{'readonly': [('state', 'in', ['process'])]}"/>
-							<field name='internal_id' attrs="{'readonly': [('state', 'in', ['process'])]}"/>
+							<field name = "from_warehouse" readonly="state in ('process')"/>
+							<field name='internal_id' readonly="state in ('process')"/>
 							<field name='invoice_id' invisible="1"/>
-							<field name = "pricelist_id" attrs="{'readonly': [('state', 'in', ['process'])]}"/>
+							<field name = "pricelist_id" readonly="state in ('process')"/>
 						</group>
 						<group>
-							<field name = "to_warehouse" attrs="{'readonly': [('state', 'in', ['process'])]}"/>
+							<field name = "to_warehouse" readonly="state in ('process')"/>
 							<field name='sale_id'  invisible="1"/>
 							<field name='purchase_id'  invisible="1"/>
-							<field name="currency_id" attrs="{'readonly': [('state', 'in', ['process'])]}"/>
+							<field name="currency_id" readonly="state in ('process')"/>
 						</group>
 					</group>
 					<notebook>
 						<page string="Product details" >
-						  <field name="product_lines" attrs="{'readonly': [('state', 'in', ['process'])]}">
-							<tree editable="bottom">
-								<field name = "internal_id"  invisible="1"/>
+						  <field name="product_lines" readonly="state in ('process')">
+							<list editable="bottom">
+								<field name = "internal_id"  column_invisible="1"/>
 								<field name="product_id"/>
 								<field name="quantity"/>
 								<field name = "price_unit"/>
-							</tree>
+							</list>
 						  </field> 
 						</page>
 					</notebook>
@@ -68,16 +68,16 @@
 		</field>
 	</record>
 
-	<record id="view_return_inter_company_transfer_tree" model="ir.ui.view">
+	<record id="view_return_inter_company_transfer_list" model="ir.ui.view">
 		<field name="name">return.inter.transfer.company.form</field>
 		<field name="model">return.inter.transfer.company</field>
 		<field name="arch" type="xml">
-			<tree string="tranfer details" create="0">
+			<list string="tranfer details" create="0">
 				<field name="name"/>
 				<field name = "from_warehouse"/>
 				<field name = "to_warehouse"/>
 				<field name="state"/>
-			</tree>
+			</list>
 		</field>
 	</record>
 
@@ -86,7 +86,7 @@
 		<field name="res_model">return.inter.transfer.company</field>
 		<field name="binding_view_types">form</field>
 		<field name="view_mode">form</field>
-		<field eval="view_return_inter_company_transfer_form" name="view_id"/>
+		<field ref="view_return_inter_company_transfer_form" name="view_id"/>
 		<field name="help" type="html">
 		  <p class="o_view_nocontent_smiling_face">
 			Record a Reverse Inter Company Transfer
@@ -99,7 +99,7 @@
 		<field name="res_model">return.inter.transfer.company</field>
 		<field name="type">ir.actions.act_window</field>
 		<field name="binding_view_types">form</field>
-		<field name="view_mode">tree,form</field>
+		<field name="view_mode">list,form</field>
 		<field name="help" type="html">
 		  <p class="o_view_nocontent_smiling_face">
 			Create a new Reverse Inter Company Transfer
