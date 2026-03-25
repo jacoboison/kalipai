@@ -15,7 +15,7 @@ from odoo.tools import html2plaintext
 class SaleOrderLineInherit(models.Model):
     _inherit = "sale.order.line"
 
-    @api.depends('move_ids.state', 'move_ids.scrapped', 'move_ids.product_uom_qty', 'move_ids.product_uom')
+    @api.depends('move_ids.state', 'move_ids.product_uom_qty', 'move_ids.product_uom')
     def _compute_qty_delivered(self):
         super(SaleOrderLineInherit, self)._compute_qty_delivered()
 
