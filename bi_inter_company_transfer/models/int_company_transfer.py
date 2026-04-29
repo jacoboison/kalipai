@@ -9,7 +9,6 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.misc import formatLang
 from odoo.tools import html2plaintext
-import odoo.addons.decimal_precision as dp
 
 class InterTransferCompany(models.Model):
     _name = 'inter.transfer.company'
@@ -25,9 +24,7 @@ class InterTransferCompany(models.Model):
 
     @api.depends('invoice_id')
     def _get_bill(self):
-
         for internal in self:
-
             internal_transfer = self.env['account.move'].search([('id','in',internal.invoice_id.ids),('move_type', '=','in_invoice')])
             
             if internal_transfer:
@@ -78,7 +75,7 @@ class InterTransferCompany(models.Model):
                         'name': action['name'],
                         'help': action['help'],
                         'type': action['type'],
-                        'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
+                        'views': [ (list_view_id ,'list'),(form_view_id,'form')],
                         'target': action['target'],
                         'context': action['context'],
                         'res_model': action['res_model'],
@@ -98,11 +95,14 @@ class InterTransferCompany(models.Model):
                         'name': action['name'],
                         'help': action['help'],
                         'type': action['type'],
-                        'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
+                        'views': [ (list_view_id ,'list'),(form_view_id,'form')],
                         'target': action['target'],
                         'context': action['context'],
                         'res_model': action['res_model'],
                     }
+        bills = self.invoice_id.filtered(lambda x:x.move_type == 'in_invoice')
+        if not bills:
+            raise ValidationError(_('This Bill is not available in ' + self.env.company.name))
         for invoice in self.invoice_id:
             if invoice.move_type == 'in_invoice':
                 result['domain'] = "[('id','in',%s)]" % invoice.ids
@@ -112,15 +112,11 @@ class InterTransferCompany(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
         domain = [('id', '=', self.purchase_id.id)]
         transfer = self.env['purchase.order'].search(domain)
+        if not transfer:
+            raise ValidationError(_('This Purchase Order is not available in ' + self.env.company.name))
         action['domain'] = [('id', '=', transfer.id)]
         return action    
 
-        #  def action_view_sale_internal(self):
-        # action = self.env.ref('sale.action_orders').read()[0]
-        # domain = [('id', '=', self.sale_id.id)]
-        # transfer = self.env['sale.order'].search(domain)
-        # action['domain'] = [('id', '=', transfer.id)]
-        # return action
            
 
     sale_id = fields.Many2one("sale.order",string="Sale Order", copy=False)
@@ -148,13 +144,12 @@ class InterTransferCompany(models.Model):
     def from_get_domain(self):
         return [('company_id','=',self.env.company.id)]     
 
-    @api.model
-    def create(self,vals):
-       
-        ict_name = self.env['ir.sequence'].next_by_code('inter.transfer.company')
-        vals['name'] =ict_name
-        res  = super(InterTransferCompany, self).create(vals)
-        return res
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            ict_name = self.env['ir.sequence'].next_by_code('inter.transfer.company')
+            vals['name'] = ict_name
+        return super(InterTransferCompany, self).create(vals_list)
 
     @api.onchange('from_warehouse')
     def change_details(self):
@@ -196,24 +191,24 @@ class InterTransferCompany(models.Model):
             partner_c_id = self.env['res.company'].search([('partner_id','=',self.to_warehouse.company_id.partner_id.id)])
             fpos = sale_order.fiscal_position_id or sale_order.partner_id.property_account_position_id
             taxes = line.product_id.taxes_id.filtered(lambda r: r.company_id == self.env.user.company_id)
-            tax_ids = fpos.map_tax(taxes, line.product_id, line.order_id.partner_shipping_id) if fpos else taxes
+            tax_ids = fpos.map_tax(taxes) if fpos else taxes
             sale_order_line_vals = {
                                 'product_id': line.product_id.id,
                                 'name': line.product_id.name,
                                 'product_uom_qty': line.quantity,
-                                'product_uom': line.product_id.uom_id.id,
-                                'tax_id':[(6, 0, tax_ids.ids)],
+                                'product_uom_id': line.product_id.uom_id.id,
+                                'tax_ids':[(6, 0, tax_ids.ids)],
                                 'price_unit' : line.price_unit,
                                 'order_id': sale_order.id
                             }
             sale_order_line_id = self.env['sale.order.line'].create(sale_order_line_vals)
         
+        sale_order.action_update_prices()
         sale_order.action_confirm()
         
         return self.write({'state':'process'})
 
     def createpurchaseorder(self):
-        
         purchase_order = self.env['purchase.order'].create({
                 'partner_id':self.to_warehouse.company_id.partner_id.id,
                 'user_id':self.env.uid,
@@ -236,7 +231,7 @@ class InterTransferCompany(models.Model):
                                 'product_uom': line.product_id.uom_id.id,
                                 'price_unit' : line.price_unit,
                                 'order_id': purchase_order.id
-                            }
+                            } 
             purchase_order_line_id = self.env['purchase.order.line'].create(purchase_order_line_vals)
         purchase_order.button_confirm()
         return self.write({'state':'process'})      
@@ -246,7 +241,6 @@ class InterTransferCompany(models.Model):
         This function returns an action that display existing vendor bills of given purchase order ids.
         When only one found, show the vendor bill immediately.
         '''
-        # self.write({'state' : 'return'})
         action = self.env["ir.actions.actions"]._for_xml_id("bi_inter_company_transfer.action_return_form_template")
         result = action
         # override the context to get rid of the default filtering
@@ -280,13 +274,22 @@ class InterTransferCompanyLines(models.Model):
     internal_id = fields.Many2one('inter.transfer.company')
     product_id = fields.Many2one('product.product' , required = True)
     quantity = fields.Integer('Quantity' , default= 1 , required = True)
-    price_unit = fields.Float('Price' , related = "product_id.lst_price")
+    price_unit = fields.Float('Price')
 
     def _prepare_internal_from_move_line(self , move):
         return({
             'product_id' : move.product_id.id,
             'quantity' : move.product_uom_qty,
-            'price_unit' : move.product_id.lst_price
+            'price_unit' : move.sale_line_id.price_unit or move.product_id.lst_price
             })
+
+    @api.onchange('product_id')
+    def _onchange_product(self):
+        for rec in self:
+            if rec.product_id:
+                rec.write({
+                        'price_unit' : rec.product_id.list_price,
+                        })
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

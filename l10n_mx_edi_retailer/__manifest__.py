@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'EDI Complement Retailer',
-    'version': '12.0.1.0.0',
+    'version': '19.0.1.0.0',
     'author': 'Vauxoo',
     'license': 'LGPL-3',
     'category': 'Hidden',

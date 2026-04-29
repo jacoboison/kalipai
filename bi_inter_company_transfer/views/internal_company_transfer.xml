@@ -6,7 +6,7 @@
 		<field name="res_model">inter.transfer.company</field>
 		<field name="type">ir.actions.act_window</field>
 		<field name="binding_view_types">form</field>
-		<field name="view_mode">tree,form</field>
+		<field name="view_mode">list,form</field>
 		<field name="help" type="html">
 		  <p class="o_view_nocontent_smiling_face">
 			Create a new Inter Company Transaction
@@ -28,26 +28,29 @@
 			<form string="tranfer details">
 
 				<header>
-					 <button name="check_tansfer_details" string="Process" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
-					 <button name="action_view_return_form" string="Reverse" type="object" class="oe_highlight" attrs="{'invisible': [('state', 'in', ['draft','return'])]}"/>
+					 <button name="check_tansfer_details" string="Process" type="object" class="oe_highlight" invisible="state not in ('draft')"/>
+					 <button name="action_view_return_form" string="Reverse" type="object" class="oe_highlight" invisible="state in ('draft','return')"/>
 					<field name="state" widget="statusbar" statusbar_visible="draft,process,return"/>
 				</header>
-				<sheet >
+				<sheet>
 					<div class="oe_button_box" name="button_box">
-						<button name="action_view_return_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('return_count', '=', 0)]}">
+						
+						<button name="action_view_return_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "return_count == 0">
 							<field name="return_count" widget="statinfo" string="Return Internal Transfer"/>
 						</button>
-						<button name="action_view_sale_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('sale_count', '=', 0)]}">
+						
+							<button name="action_view_sale_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "sale_count == 0">
 							<field name="sale_count" widget="statinfo" string="Sale Order"/>
 						</button>
-						<button name="action_view_invoice_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('invoice_count', '=', 0)]}">
+						
+						<button name="action_view_invoice_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "invoice_count == 0">
 							<field name="invoice_count" widget="statinfo" string="Invoice"/>
 						</button>
 
-						<button name="action_view_invoice_internal_bill" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('bill_count', '=', 0)]}">
+						<button name="action_view_invoice_internal_bill" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "bill_count == 0">
 							<field name="bill_count" widget="statinfo" string="Bill"/>
 						</button>
-						<button name="action_view_purchase_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('purchase_id', '=', False)]}">
+						<button name="action_view_purchase_internal" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible = "purchase_id == False">
 							<field name="purchase_count" widget="statinfo" string="Purchase Order"/>
 						</button>
 					</div>
@@ -59,26 +62,26 @@
 					</div>
 					<group >
 						<group >
-							<field name = "from_warehouse" required= "1" attrs="{'readonly': [('state', 'in', ['process','return'])]}"/>
+							<field name = "from_warehouse" required= "1" readonly="state in ('process','return')"/>
 							
-							<field name = "to_warehouse" required= "1" attrs="{'readonly': [('state', 'in', ['process','return'])]}"/>
+							<field name = "to_warehouse" required= "1" readonly="state in ('process','return')"/>
 							
 						</group>
 						<group>
-							<field name = "apply_type" required= "1" attrs="{'readonly': [('state', 'in', ['process','return'])]}" invisible = "0"/>
-							<field name="currency_id" attrs="{'readonly': [('state', 'in', ['process','return'])] ,'invisible':[('apply_type','in',['sale','sale_purchase'])]}"/>
-							<field name = "pricelist_id" attrs="{'readonly': [('state', 'in', ['process','return'])]  ,'invisible':[('apply_type','in',['purchase','sale_purchase'])]}"/>
+							<field name = "apply_type" required= "1" readonly="state in ('process','return')" invisible = "0"/>
+							<field name="currency_id" readonly="state in ('process','return')" invisible="apply_type in ('sale','sale_purchase')"/>
+							<field name = "pricelist_id" readonly="state in ('process','return')" invisible="apply_type in ('purchase','sale_purchase')"/>
 						</group>
 					</group>
 					<notebook >
 						<page string="Product details">
-						  <field name="product_lines" attrs="{'readonly': [('state', 'in', ['process','return'])]}">
-							<tree editable="bottom" >
-								<field name = "internal_id"  invisible="1"/>
+						  <field name="product_lines" readonly="state in ('process','return')">
+							<list editable="bottom" >
+								<field name = "internal_id"  column_invisible="1"/>
 								<field name="product_id"/>
 								<field name="quantity"/>
 								<field name = "price_unit"/>
-							</tree>
+							</list>
 						  </field> 
 						</page>
 					</notebook>
@@ -87,18 +90,18 @@
 		</field>
 	</record>
 
-	<record id="view_inter_company_transfer_tree" model="ir.ui.view">
+	<record id="view_inter_company_transfer_list" model="ir.ui.view">
 		<field name="name">inter.transfer.company.form</field>
 		<field name="model">inter.transfer.company</field>
 		<field name="arch" type="xml">
-			<tree string="tranfer details">
+			<list string="tranfer details">
 				<field name="name"/>
 				<field name = "from_warehouse"/>
 				<field name = "to_warehouse"/>
 				<field name="sale_id"/>
 				<field name="purchase_id"/>
 				<field name="state"/>
-			</tree>
+			</list>
 		</field>
 	</record>
 
@@ -144,7 +147,7 @@
 		<field name="inherit_id" ref="purchase.purchase_order_form"/>
 		<field name="arch" type="xml">
 		<xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-				<button type="object" name="action_view_internal" class="oe_stat_button" icon="fa-exchange" attrs="{'invisible':['|', ('inter_transfer_count', '=', 0), ('state', 'in', ('draft','sent','to approve'))]}" >
+				<button type="object" name="action_view_internal" class="oe_stat_button" icon="fa-exchange" invisible = "inter_transfer_count == 0 or state in ('draft','sent','to approve')">
 					<field name="inter_transfer_count" widget="statinfo" string="Inter Transfer Company"/>
 					<field name="internal_id" invisible="1"/>
 				</button>
@@ -158,7 +161,7 @@
 		<field name="inherit_id" ref="sale.view_order_form"/>
 		<field name="arch" type="xml">
 		<xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-				<button type="object" name="action_view_internal" class="oe_stat_button" icon="fa-exchange" attrs="{'invisible':['|', ('inter_transfer_count', '=', 0), ('state', 'in', ('draft','sent','to approve'))]}" >
+				<button type="object" name="action_view_internal" class="oe_stat_button" icon="fa-exchange" invisible = "inter_transfer_count == 0 or state in ('draft','sent','to approve')">
 					<field name="inter_transfer_count" widget="statinfo" string="Inter Transfer Company"/>
 					<field name="internal_id" invisible="1"/>
 				</button>

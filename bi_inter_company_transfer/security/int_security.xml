@@ -32,16 +32,6 @@
     </record>
 
 
-<!-- 
-     <record id="account.invoice_comp_rule" model="ir.rule">
-        <field name="name">Invoice multi-company</field>
-        <field name="model_id" ref="account.model_account_move"/>
-        <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','in',user.company_ids.ids)]</field>
-    </record> -->
-
-
-
     <record model="ir.rule" id="stock.stock_location_comp_rule">
         <field name="name">Location multi-company</field>
         <field name="model_id" ref="stock.model_stock_location"/>

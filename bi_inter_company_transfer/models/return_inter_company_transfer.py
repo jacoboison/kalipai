@@ -5,12 +5,10 @@
 from itertools import groupby
 from datetime import datetime, timedelta
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError , Warning
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.misc import formatLang
 from odoo.tools import html2plaintext
-import odoo.addons.decimal_precision as dp
-
 
 class ReturnPickingLine(models.Model):
     _name = "stock.return.picking.inter.company"
@@ -82,18 +80,18 @@ class ReturnInterTransferCompany(models.Model):
     product_lines = fields.One2many('return.inter.transfer.company.line','return_id',string="lines")
     product_return_moves = fields.One2many('stock.return.picking.inter.company','wizard_id')
 
-    @api.model
-    def create(self,vals):
-       
-        rict_name = self.env['ir.sequence'].next_by_code('return.inter.transfer.company')
-        vals['name'] =rict_name
-        res  = super(ReturnInterTransferCompany, self).create(vals)
-        internal_id = self.env['inter.transfer.company'].search([('id','=',vals['internal_id'])])
-        internal_id.write({
-            'return_id':res.id,
-            'state' : 'return'
-            })
-        return res
+    @api.model_create_multi
+    def create(self,vals_list):
+        for vals in vals_list:
+            rict_name = self.env['ir.sequence'].next_by_code('return.inter.transfer.company')
+            vals['name'] =rict_name
+            res  = super(ReturnInterTransferCompany, self).create(vals_list)
+            internal_id = self.env['inter.transfer.company'].search([('id','=',vals['internal_id'])])
+            internal_id.write({
+                'return_id':res.id,
+                'state' : 'return'
+                })
+            return res
 
     def action_view_sale_internal(self):
         action = self.env["ir.actions.actions"]._for_xml_id("sale.action_orders")
@@ -119,7 +117,7 @@ class ReturnInterTransferCompany(models.Model):
                         'name': action['name'],
                         'help': action['help'],
                         'type': action['type'],
-                        'views': [ (list_view_id ,'tree'),(form_view_id,'form')],
+                        'views': [ (list_view_id ,'list'),(form_view_id,'form')],
                         'target': action['target'],
                         'context': action['context'],
                         'res_model': action['res_model'],
@@ -171,13 +169,14 @@ class ReturnInterTransferCompany(models.Model):
         for inv in inv_obj.browse(self.internal_id.invoice_id.ids):
             if inv.move_type == 'out_invoice':
                 credit_note_wizard = self.env['account.move.reversal'].with_context({'active_ids': [inv.id], 'active_id': inv.id, 'active_model': 'account.move'}).create({
-                    'refund_method': 'refund',  
                     'reason': 'reason test create',
                     'journal_id': inv.journal_id.id,
-
+                  
                 })
                 credit_note_wizard.reverse_moves()
                 refund = inv.sorted(key=lambda inv: inv.id, reverse=False)[-1]
+                # if refund.reversal_move_id :
+                #     refund.reversal_move_id.action_post()
                 created_inv.append(refund.id)
                 if mode in ('cancel', 'modify'):
                     movelines = inv.move_id.line_ids
@@ -189,7 +188,7 @@ class ReturnInterTransferCompany(models.Model):
                             to_reconcile_ids.setdefault(line.account_id.id, []).append(line.id)
                         if line.reconciled:
                             line.remove_move_reconcile()
-                    refund.action_post()
+                    refund._post()
                     for tmpline in refund.move_id.line_ids:
                         if tmpline.account_id.id == inv.account_id.id:
                             to_reconcile_lines += tmpline
@@ -230,10 +229,10 @@ class ReturnInterTransferCompany(models.Model):
                 bill_details.append(refund.id)
                 self.write({
                     'state':'process',
-                    'invoice_id':[(6 ,0 ,bill_details)]
+                    'invoice_id': [(6, 0, bill_details)]
                     })
                 if refund.state != 'posted':
-                    refund.action_post()
+                    refund._post()
             
     def CreateBillCreditNote(self):
         inv_obj = self.env['account.move']
@@ -249,12 +248,13 @@ class ReturnInterTransferCompany(models.Model):
         for inv in inv_obj.browse(self.internal_id.invoice_id.ids):
             if inv.move_type == 'in_invoice':
                 credit_note_wizard = self.env['account.move.reversal'].with_context({'active_ids': [inv.id], 'active_id': inv.id, 'active_model': 'account.move'}).create({
-                    'refund_method': 'refund',  
                     'reason': 'reason test create',
-                    'journal_id': inv.journal_id.id,
+                    'journal_id': inv.journal_id.id
                 })
                 credit_note_wizard.reverse_moves()
                 refund = inv.sorted(key=lambda inv: inv.id, reverse=False)[-1]
+                # if refund.reversal_move_id :
+                #     refund.reversal_move_id.action_post()
                 created_inv.append(refund.id)
                 if mode in ('cancel', 'modify'):
                     movelines = inv.move_id.line_ids
@@ -324,11 +324,11 @@ class ReturnInterTransferCompany(models.Model):
                     location_id = False
                     original_location_id = False
                     res.update({'picking_id': picking.id})
-                    for move in picking.move_lines:
+                    for move in picking.move_ids:
                         for product in self.product_lines:
                             if move.product_id == product.product_id:
-                                if move.scrapped:
-                                    continue
+                                # if move.scrapped:
+                                #     continue
                                 if move.move_dest_ids:
                                     move_dest_exists = True
 
@@ -345,15 +345,15 @@ class ReturnInterTransferCompany(models.Model):
                     picking_type_id = picking.picking_type_id.return_picking_type_id.id or picking.picking_type_id.id
                     
                     new_picking = picking.copy({
-                        'move_lines': [],
+                        'move_ids': [],
                         'picking_type_id': picking_type_id,
                         'state': 'draft',
                         'origin': _("Return of %s") % picking.name,
                         'location_id': picking.location_dest_id.id,
                         'location_dest_id': location_id})
-                    new_picking.message_post_with_view('mail.message_origin_link',
-                        values={'self': new_picking, 'origin': picking},
-                        subtype_id=self.env.ref('mail.mt_note').id)
+                    new_picking.message_post_with_source('mail.message_origin_link',
+                        render_values={'self': new_picking, 'origin': picking},
+                        subtype_xmlid='mail.mt_note')
                     returned_lines = 0
                     for return_line in self.product_return_moves:
                         if not return_line.move_id:
@@ -377,9 +377,9 @@ class ReturnInterTransferCompany(models.Model):
                     new_picking.action_assign()
                     self.product_return_moves.unlink()
                     for move in new_picking.move_line_ids:
-                        move.write({'qty_done':move.product_uom_qty})
-                    for move_line in new_picking.move_lines:
-                        move_line.write({'quantity_done': move_line.product_uom_qty})
+                        move.write({'quantity':move.quantity})
+                    for move_line in new_picking.move_ids:
+                        move_line.write({'quantity': move_line.product_uom_qty})
                     new_picking.button_validate()
                     self.write({'state':'process'})
 
@@ -394,11 +394,11 @@ class ReturnInterTransferCompany(models.Model):
                     location_id = False
                     original_location_id = False
                     res.update({'picking_id': picking.id})
-                    for move in picking.move_lines:
+                    for move in picking.move_ids:
                         for product in self.product_lines:
                             if move.product_id == product.product_id:
-                                if move.scrapped:
-                                    continue
+                                # if move.scrapped:
+                                #     continue
                                 if move.move_dest_ids:
                                     move_dest_exists = True
 
@@ -415,15 +415,16 @@ class ReturnInterTransferCompany(models.Model):
                     picking_type_id = picking.picking_type_id.return_picking_type_id.id or picking.picking_type_id.id
                     
                     new_picking = picking.copy({
-                        'move_lines': [],
+                        'move_ids': [],
                         'picking_type_id': picking_type_id,
                         'state': 'draft',
                         'origin': _("Return of %s") % picking.name,
                         'location_id': picking.location_dest_id.id,
                         'location_dest_id': location_id})
-                    new_picking.message_post_with_view('mail.message_origin_link',
-                        values={'self': new_picking, 'origin': picking},
-                        subtype_id=self.env.ref('mail.mt_note').id)
+                   
+                    new_picking.message_post_with_source('mail.message_origin_link',
+                        render_values={'self': new_picking, 'origin': picking},
+                        subtype_xmlid='mail.mt_note')
                     returned_lines = 0
                     for return_line in self.product_return_moves:
                         if not return_line.move_id:
@@ -447,14 +448,15 @@ class ReturnInterTransferCompany(models.Model):
                     new_picking.action_assign()
                     self.product_return_moves.unlink()
                     for move in new_picking.move_line_ids:
-                        move.write({'qty_done':move.product_uom_qty})
-                    for move_line in new_picking.move_lines:
-                        move_line.write({'quantity_done': move_line.product_uom_qty})
-                    new_picking.button_validate()
+                        move.write({'quantity':move.quantity})
+                    for move_line in new_picking.move_ids:
+                        move_line.write({'quantity': move_line.product_uom_qty})
+                    new_picking._action_done()
                     self.write({'state':'process'})
 
     def revertorder(self):
         if self.sale_id.id:
+
             self.ReturnPicking()
             self.CreateInvoiceCreditNote()
             
@@ -473,6 +475,6 @@ class ReturnInterTransferCompanyLines(models.Model):
     return_id = fields.Many2one('return.inter.transfer.company')
     product_id = fields.Many2one('product.product')
     quantity = fields.Integer('Quantity' , default= 1)
-    price_unit = fields.Float('Price' , related = "product_id.lst_price")
+    price_unit = fields.Float('Price')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
